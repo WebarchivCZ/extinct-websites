@@ -1,4 +1,7 @@
-# extinct-websites
+# Extinct Websites
+
+
+## O aplikaci
 
 Aplikace slouží jako automatizované řešení pro identifikaci a popis mrtvých webů jak v rámci našeho archivu historicky, tak při nových sklizních. Následně je ukládá do vlastní databáze a zpřístupňuje kurátorům, kteří s informacemi v ní dále nakládají, interpretují je a obsah klasifikují. 
 
@@ -10,11 +13,11 @@ Aplikace byla navržena pro potřeby Českého webového archivu NK ČR (Webarch
 
 
 
-**Skladba**
+## **Skladba**
 databázová struktura
 WebBeat - aplikace pro extrakci obsahových, síťových a infrastrukturních dat, webových stránek, skript Logparser pro analýzu dat z logů… (stačí stručně technický popis)
 
-**Začínáme**
-**Prerekvizity**
-**Instalace**
-**Vývoj** 
+## **Začínáme**
+## **Prerekvizity**
+## **Instalace**
+## **Vývoj** 
