@@ -15,7 +15,7 @@ Aplikace byla navržena pro potřeby Českého webového archivu NK ČR (Webarch
 
 ## **Skladba**
 databázová struktura
-WebBeat - aplikace pro extrakci obsahových, síťových a infrastrukturních dat, webových stránek, skript Logparser pro analýzu dat z logů… (stačí stručně technický popis)
+WebBeat - aplikace pro extrakci obsahových, síťových a infrastrukturních dat, webových stránek, skript Logparser pro analýzu dat z logů… 
 
 ## **Začínáme**
 ## **Prerekvizity**
