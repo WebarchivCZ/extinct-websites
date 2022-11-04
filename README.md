@@ -3,9 +3,9 @@
 
 ## O aplikaci
 
-Aplikace slouží jako automatizované řešení pro identifikaci a popis mrtvých webů jak v rámci našeho archivu historicky, tak při nových sklizních. Následně je ukládá do vlastní databáze a zpřístupňuje kurátorům, kteří s informacemi v ní dále nakládají, interpretují je a obsah klasifikují. 
+Aplikace slouží jako automatizované řešení pro identifikaci a popis mrtvých webů. Následně je ukládá do vlastní databáze a zpřístupňuje kurátorům, kteří s informacemi v ní dále nakládají, interpretují je a obsah klasifikují. 
 
-Aplikace v prvním plánu identifikuje mrtvé weby za pomocí stavových kódů, dle kterých kategorizuje na skupiny, jimiž jsou automatizovány další procesy jako je ověřování metadat z živých webů, či historických metadat pocházejících z logů heritirxu (ad. workflow figma). Aplikace identifikuje mrtvé weby do úrovně domén 3. řádů.
+Aplikace v prvním plánu identifikuje mrtvé weby za pomocí stavových kódů, dle kterých kategorizuje na skupiny, jimiž jsou automatizovány další procesy jako je ověřování metadat z živých webů, databáze WhoIS, či historických metadat. Aplikace identifikuje mrtvé weby do úrovně domén 3. řádů.
 
 Aplikace nám pomáhá uchopit pojem mrtvý web, což  je prospěšné z hlediska webarchivářské praxe. Určením topologie mrtvého webu a ukotvením termínu, bude totiž možné dlouhodobě monitorovat zanikajicí weby a získat tak exkluzivní zprávu o mizející webové krajině. 
 
