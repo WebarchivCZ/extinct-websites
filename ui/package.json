@@ -1,0 +1,40 @@
+{
+  "name": "ExtinctWebsites",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w -s",
+    "start": "sirv public -s",
+    "validate": "svelte-check"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-node-resolve": "^11.0.0",
+    "@rollup/plugin-typescript": "^8.0.0",
+    "@smui/tab": "^6.1.0",
+    "@smui/tab-bar": "^6.1.0",
+    "@tsconfig/svelte": "^1.0.0",
+    "rollup": "^2.3.4",
+    "rollup-plugin-css-only": "^3.1.0",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-svelte": "^7.0.0",
+    "rollup-plugin-terser": "^7.0.0",
+    "svelte": "^3.0.0",
+    "svelte-check": "^1.0.0",
+    "svelte-preprocess": "^4.0.0",
+    "tslib": "^2.0.0",
+    "typescript": "^4.0.0"
+  },
+  "dependencies": {
+    "sirv-cli": "^1.0.0",
+    "svelte-icons": "^2.1.0",
+    "svelte-loading-spinners": "^0.1.4",
+    "svelte-material-ui": "^6.1.3",
+    "svelte-mui": "^0.3.3-7",
+    "svelte-paginate": "^0.0.1",
+    "svelte-routing": "^1.5.0",
+    "svelte-tooltip": "^1.2.0",
+    "svelty-picker": "^2.0.0"
+  }
+}
