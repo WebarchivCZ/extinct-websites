@@ -141,6 +141,18 @@ function check($url) {
 		$col.="date='".date("Y-m-d H:i:s")."' ";
 		
 		mysqli_query($GLOBALS['db'], "INSERT INTO status SET ".$col);
+		
+		//uložení do databáze mrtvých webů
+		if($status['dead']) {
+			$exists=false;
+			$select=mysqli_query($db, "select id from exticint where id_url=".$url->getUrlId());
+			while($r=mysqli_fetch_array($select)) {
+				$exists=$r['id'];
+			}
+			if(empty($exists)) {
+				mysqli_query($GLOBALS['db'], "INSERT INTO exticint SET exticintDate='".date("Y-m-d H:i:s")."', id_url=".$url->getUrlId());
+			}
+		}
 	}
 
 

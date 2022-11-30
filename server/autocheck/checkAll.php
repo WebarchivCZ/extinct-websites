@@ -9,9 +9,8 @@ $status=array();
 
 $select=mysqli_query($db, "SELECT url from url order by id ASC");
 while($r=mysqli_fetch_array($select)) {	
-	$url=explode("/", $r['url']);
-	if(!empty($url[0])) {
-		$status[]=check($url[0]);
+	if(!empty($r['url'])) {
+		$status[]=check($r['url']);
 	}
 }
 

@@ -112,7 +112,7 @@ class URL {
 	}
 
 	function loadUrlId($db) {
-		$select=mysqli_query($db, "SELECT id from url where url='".$this->replaceUrl($this->url)."' limit 0,1");
+		$select=mysqli_query($db, "SELECT id from url where url LIKE '%".$this->replaceUrl($this->url)."%' limit 0,1");
 		while($r=mysqli_fetch_array($select)) {	
 			$this->url_id=$r['id'];
 		}
