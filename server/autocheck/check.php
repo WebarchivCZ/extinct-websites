@@ -1,5 +1,5 @@
 <?php
-include "./check.class.php";
+include __DIR__."/check.class.php";
 
 function check($url) {
 	$status=array();
@@ -62,7 +62,11 @@ function check($url) {
 				$maxScore=30; break;		
 			}
 			//přičtení indexu
-			$percent=$maxScore/intval($status['pagedata_count'][$key]);
+			if(!empty($status['pagedata_count'][$key])) {
+				$percent=$maxScore/intval($status['pagedata_count'][$key]);
+			} else {
+				$percent=0;
+			}
 			$status['deadIndex']+=round(count($status['pagedata_diff'][$key])*$percent);
 			
 			
