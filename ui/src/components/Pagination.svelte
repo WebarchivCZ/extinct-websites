@@ -2,14 +2,32 @@
  export let page=1;
  export let records=0;
  export let limit=100;
- 
  export let maxPages=14;
+ export let pages=false;
  
  let countPage=Math.ceil(records/limit);
  
  function getPages() {
- 	let pages=[];
+ 	pages=[];
+ 	let pagesBefore=0;
+ 	let pagesAfter=0;
  	
+ 	pagesAfter=page+Math.round(maxPages/2);
+ 	if(pagesAfter>=countPage) {
+ 		pagesBefore+=countPage-pagesAfter;
+ 		pagesAfter=countPage;
+ 	}
+ 	pagesBefore+=page-Math.round(maxPages/2);
+ 	if(pagesBefore<1) {
+ 		pagesAfter+=0-pagesBefore;
+ 		if(pagesAfter>=countPage) { pagesAfter=countPage; }
+ 		pagesBefore=1;
+ 	}
+ 	
+ 	for(let i=pagesBefore; i<=pagesAfter; i++) {
+ 		pages[pages.length]=i; 
+ 	}
+ 	/*
  	for(let i=(page-Math.ceil(maxPages/2)); i<=page; i++) {
  		if(i>0 && (i<=Math.ceil(records/limit))) { pages[pages.length]=i; }
  	}
@@ -18,43 +36,64 @@
  	for(let i=(page+1); i<(page+Math.ceil(maxPages/2)+1); i++) {
  		if(i<=Math.ceil(records/limit)) { pages[pages.length]=i; }
  	}
+ 	*/
  	console.log(pages);
- 	return pages;
+ 	return "";
+ }
+ 
+ function goToPage(p) {
+ 	page=p;
+ 	getPages();
  }
  
   $: {
- 	if(countPage && (page*limit)>records) { page=countPage; }
+ 	if(page>countPage) { page=countPage; }
+ 	else if(page<=0) { page=1; }
  }
  
 </script>
 
 {#if countPage}
-<center>
-  Strany: 
-    {#if getPages()[0]!=1}
-    	<a on:click="{()=>(page=1)}" style="cursor:pointer">1</a>&nbsp;&nbsp;
-    	&middot;
-    	&nbsp;&nbsp;
+<div class="pagination">
+ <span class="page" on:click="{()=>(goToPage(page-1))}">&lt;</span>
+    {getPages()}
+    {#if pages}
+	    {#if pages[0]!=1}
+	    	<span class="page" on:click="{()=>(goToPage(1))}">1</span>
+	    {/if}
+	    {#each pages as p}
+		  	{#if page==p}
+		  		<span class="page pageActive">{p}</span>
+		  	{:else if p!=0}
+		  		<span class="page" on:click="{()=>(goToPage(p))}">{p}</span>
+		  	{/if}
+		 
+	    {/each}
+	    {#if pages.slice(-1)[0]!=countPage && countPage && countPage>0 && countPage!=page}	
+	    	<span class="page" on:click="{()=>(goToPage(countPage))}">{countPage}</span>
+	    {/if}
     {/if}
-    {#each getPages() as p}
-  	{#if page==p}
-  		&middot;&nbsp;&nbsp; {p}
-  	{:else if p==0}
-  		&middot;
-  	{:else}
-  		<a on:click="{()=>(page=(p))}" style="cursor:pointer">{p}</a>
-  	{/if}
-  	&nbsp;&nbsp;
-  {/each}
-    {#if getPages().slice(-1)[0]!=countPage && countPage && countPage>0 && countPage!=page}	
-    	&middot;
-    	&nbsp;&nbsp;
-    	<a on:click="{()=>(page=(countPage))}" style="cursor:pointer">{countPage}</a>
-    {/if}
-  
-</center>
+ <span class="page" on:click="{()=>(goToPage(page+1))}">&gt;</span>
+</div>
 {/if}
 
 <style>
-a, a:link  { color: rgb(0,80,160)!important; text-decoration:underline!important; }
+.pagination {
+	display: flex;
+	justify-content: center;
+	background: #FFF;
+	border-radius: 3px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.page {
+	padding: 10px 12px;
+	cursor:pointer
+}
+.page:hover {
+  background: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+.pageActive  { 
+	color: hsl(200, 70%, 50%)!important; 
+}
 </style>

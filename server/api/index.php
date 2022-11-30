@@ -1,15 +1,10 @@
 <?php
 header("Content-Type: application/json");
 header('Access-Control-Allow-Origin: *');
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
-
-include "../../connect.php";
+include $_SERVER['CONTEXT_DOCUMENT_ROOT']."/connect.php";
 include "../fce.php";
 include "./api.class.php";
-
 
 $api=new Api("url", "id", "url", "url");
 
@@ -29,11 +24,19 @@ if($_GET['type']=="app") {
 		$api->addSubItem("dead");
 		$api->addSubItem("confirmed");
 		$api->addSubItem("requires");	
-		$api->addSubItem("metadata_match");	
-		$api->addSubItem("date");	
+		$api->addSubItem("metadata");	
+		$api->addSubItem("metadata_match");
+		$api->addSubItem("whois");		
+		$api->addSubItem("date");
+		
+	$api->addGroup("exticint");
+		$api->addSubItem("date", false, "exticintDate");
 		
 	$api->dataMoveArray("url", "seeds_info");
 	$api->dataMoveArray("contract", "seeds_info");
+	
+} elseif($_GET['type']=="url") {
+	$api->addItem("url");
 
 } else {
 	$api->addItem("id", "urlid");
@@ -46,7 +49,7 @@ if($_GET['type']=="app") {
 		$api->addSubItem("to");
 
  
- 	$api->addExtension("harvest_metadata", "harvest", "id_url", "harvest_metadata", false, false, "id", "id ASC");
+ 	$api->addExtension("harvest_metadata", "harvest", "id_url", "harvest_metadata", false, false, "id", "timestamp DESC, id DESC");
  		$api->addExtensionItem("timestamp");
  		$api->addExtensionItem("crawler");
  		$api->addExtensionItem("harvest"); 		
@@ -72,13 +75,14 @@ if($_GET['type']=="app") {
 
 
 	//webbeat
-	$api->addExtension("whois", "whois", "id_url", "whois", false, false, "id", "id ASC");
+	$api->addExtension("whois", "whois", "id_url", "whois", false, false, "id", "id DESC");
 		$api->addExtensionItem("domain_name");
  		$api->addExtensionItem("registrant_name");
  		$api->addExtensionItem("registrar");
  		$api->addExtensionItem("creation_date", "times.creation_date");
  		$api->addExtensionItem("expiration_date", "times.expiration_date");
  		
+ 		//$api->addExtensionItem("Error");
  			$api->addExtension("name_servers", "name_servers", "id_whois", "name_servers", true);
  				$api->addExtensionItem("srv");
  				$api->addExtensionItem("srv_ip");
@@ -87,7 +91,8 @@ if($_GET['type']=="app") {
  				$api->addExtensionItem("date");
 	
 	
-	$api->addExtension("page_data", "page_data", "id_url", "page_data", false, true, "id", "id ASC");
+	$api->addExtension("page_data", "page_data", "id_url", "page_data", false, true, "id", "date DESC, id DESC");
+		$api->setExtensionDate(date("Y-m-d"));
 		$api->addExtensionItem("type");
  		$api->addExtensionItem("value");
  	
@@ -97,18 +102,25 @@ if($_GET['type']=="app") {
 
 $limit=100;
 $from=0;
-$where="";
+$where="url!='' ";
 $join="";
 if(!empty($_GET['limit']) && $_GET['limit']>0 && $_GET['limit']<=5000) { $limit=intval($_GET['limit']); }
 if(!empty($_GET['from'])) { $from=intval($_GET['from']); }
 elseif(!empty($_GET['page'])) { $from=$limit*intval($_GET['page']); }
-if(!empty($_GET['uuid'])) { $where=" uuid='".$api->sqlInject($_GET['uuid'])."'"; }
-elseif(!empty($_GET['search'])) { $where=" url LIKE '%".$api->sqlInject($_GET['search'])."%'"; }
+if(!empty($_GET['uuid'])) { $where.="and uuid='".$api->sqlInject($_GET['uuid'])."'"; }
+elseif(!empty($_GET['search'])) { $where.="and url LIKE '%".$api->sqlInject($_GET['search'])."%'"; }
 if(!empty($_GET['filter'])) { 
 	if($where!="") { $where.=" and"; }
 	if($_GET['filter']=="unknown") { $where.=" status.requires=true and status.confirmed=false"; }
-	elseif($_GET['filter']=="dead") { $where.=" status.dead=1"; }
-	elseif($_GET['filter']=="live") { $where.=" (status.dead=0 or status.dead IS NULL)"; }
+	elseif($_GET['filter']=="dead") { $where.=" (status.dead=1 or exticint.exticintDate IS NOT NULL)"; }
+	elseif($_GET['filter']=="live") { $where.=" ((status.dead=0 or status.dead IS NULL) and status.requires!=true and exticint.exticintDate IS NULL)"; }
+}
+if(!empty($_GET['dateFrom'])) { 
+	if($where!="") { $where.=" and"; }
+	$where.=" exticint.exticintDate>='".$api->sqlInject($_GET['dateFrom'])." 00:00:00'";
+	if(!empty($_GET['dateTo'])) {
+		$where.=" and exticint.exticintDate<='".$api->sqlInject($_GET['dateTo'])." 23:59:59'";
+	}
 }
 
 if(!empty($_GET['kat'])) { 
@@ -124,7 +136,7 @@ else { $data=$api->getData(); }
 
 $out["data"]=$data;
 $out["stats"]["sum"]=$api->getSum($db, $where, $join);
-$out["stats"]["query"]=$api->getSqlQuery($where, $order, $from, $limit, $join);
+if(DEBUG) { $out["stats"]["query"]=$api->getSqlQuery($where, $order, $from, $limit, $join); }
 
 echo json_encode($out);
 

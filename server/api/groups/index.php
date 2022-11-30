@@ -2,7 +2,7 @@
 header("Content-Type: application/json");
 header('Access-Control-Allow-Origin: *');
 
-include "../../../connect.php";
+include $_SERVER['CONTEXT_DOCUMENT_ROOT']."/connect.php";
 include "../../fce.php";
 include "../../sqlClass.php";
 

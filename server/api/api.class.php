@@ -47,6 +47,11 @@ class Api {
 		}
 	}
 	
+	function setExtensionDate($date="0000-00-00", $column="date") {
+		$count=count($this->extensions);
+		if($count>0) { $this->extensions[($count-1)]->setExtensionDate($date, $column); }
+	}
+	
 	function getLastGroup() {
 		$prev=count($this->groups)-1;
 		if($prev<0) { $prev=0; }
@@ -144,12 +149,22 @@ class Api {
 			if($ext->getSubGroupId()==$idExtension) {
 				if($ext->isListOfValues()) {
 					$i=-1; $lastId=0;
+					$select=mysqli_query($connection, "SELECT * from ".$ext->getTable()." where ".$ext->getWhereColumn()." IN(".implode(',',$idArray).") order by date DESC, ".$ext->getWhereColumn()." ASC");
+					while($r=mysqli_fetch_array($select)) {	
+							if($lastId!=$r[$ext->getWhereColumn()]) { $i++; }
+							$date=$r['date'];
+							if(empty($date)) { $date="0000-00-00"; }
+							$arr[$i][$ext->getName()][$r[1]][$date][]=$r[2];
+							$lastId=$r[$ext->getWhereColumn()];
+					}
+					/*
+					//bez data
 					$select=mysqli_query($connection, "SELECT * from ".$ext->getTable()." where ".$ext->getWhereColumn()." IN(".implode(',',$idArray).") order by ".$ext->getWhereColumn()." ASC");
 					while($r=mysqli_fetch_array($select)) {	
 							if($lastId!=$r[$ext->getWhereColumn()]) { $i++; }
 							$arr[$i][$ext->getName()][$r[1]][]=$r[2];
 							$lastId=$r[$ext->getWhereColumn()];
-					}
+					}*/
 							
 				} else {
 					//$arr['sql'][]=$ext->getSelect($idArray);
@@ -238,20 +253,7 @@ class Api {
 				unset($this->data[$i][$name]);
 			}
 		}
-	}
-	
-	/*
-	function enhance($connection) {
-		LEFT JOIN harvest_report on harvest_report.id_harvest=harvest.id";
-					$hd=$harvest->getData(0, 200, "id_url=".intval($d["urlid"]), "*", "timestamp ASC
-					
-		$select=mysqli_query($connection, "SELECT * from");
-		while($r=mysqli_fetch_array($select)) {	
-					
-	}*/
-	
-	//function getJsonData($connection, $where="", $order="", $from=0, $to=100) { return json_encode($this->getDataArray($connection, $where, $order, $from, $limit)); }
-	
+	}	
 	
 	function getLastId($connection, $table=false) {
 		if(!$table) { $table=$this->mainSqlTable; }
@@ -278,6 +280,7 @@ class Api {
 		if(!empty($data)) {
 			for($i=0; $i<count($data); $i++) {
 				$v=$data[$i];
+				if(!empty($v[0])) { $v=$v[0]; }
 				$lastId=false;
 				$hashValue=false;
 				
@@ -386,12 +389,12 @@ class Api {
 									if(is_array($val)) {
 										//pokud je vložená hodnota pole
 		 								foreach($val as &$v) {
-					 						$sql="INSERT INTO ".$ext->getTable()." SET ".$col[0]."='".$this->sqlInject($key)."', ".$col[1]."='".$this->sqlInject($v)."', ".$ext->getWhereColumn()."=".intval($lastId).";";
+					 						$sql="INSERT INTO ".$ext->getTable()." SET ".$col[0]."='".$this->sqlInject($key)."', ".$col[1]."='".$this->sqlInject($v)."', ".$ext->getWhereColumn()."=".intval($lastId).$ext->getDateSet().";";
 											mysqli_query($connection, $sql);
 											if(DEBUG) { echo $sql."\n"; }
 										}
 									} elseif($val!="None" && $val!="NaN") {
-				 						$sql="INSERT INTO ".$ext->getTable()." SET ".$col[0]."='".$this->sqlInject($key)."', ".$col[1]."='".$this->sqlInject($val)."', ".$ext->getWhereColumn()."=".intval($lastId).";";
+				 						$sql="INSERT INTO ".$ext->getTable()." SET ".$col[0]."='".$this->sqlInject($key)."', ".$col[1]."='".$this->sqlInject($val)."', ".$ext->getWhereColumn()."=".intval($lastId).$ext->getDateSet().";";
 										mysqli_query($connection, $sql);
 										if(DEBUG) { echo $sql."\n"; }
 									}
@@ -581,7 +584,13 @@ class ApiGroup {
 	}
 	
 	function getSqlJoin($parentTable="") {
-		$join="LEFT JOIN ".$this->sqlTable." ON ".$this->sqlTable.".id_".$parentTable."=".$parentTable.".id";
+		//$join="LEFT JOIN ".$this->sqlTable." ON ".$this->sqlTable.".id_".$parentTable."=".$parentTable.".id";
+		$join="LEFT JOIN ".$this->sqlTable." ON ".$this->sqlTable.".id_".$parentTable."=".$parentTable.".id 
+			AND NOT EXISTS (
+			     SELECT 1 FROM ".$this->sqlTable." t2
+			     WHERE t2.id_".$parentTable."=".$parentTable.".id
+			     AND t2.id >  ".$this->sqlTable.".id
+			   )";
 		foreach($this->groups as &$group) {
 			$join.=" ".$group->getSqlJoin($this->sqlTable);
 		}
@@ -613,6 +622,8 @@ class ApiExtension {
 	private $listOfValues;
 	private $idInArray;
 	private $orderby;
+	private $date;
+	private $dateColumn;
 	private $items;
 	
 	function __construct($id, $name, $table, $whereColumn=false, $importArray=false, $subGroupId=false, $listOfValues=false, $idInArray="id", $orderby="id ASC") {
@@ -633,6 +644,11 @@ class ApiExtension {
 		$this->items[]=new ApiItem($name, $importName, $sqlName);
 	}
 	
+	function setExtensionDate($date, $column) {
+		$this->date=$date;
+		$this->dateColumn=$column;
+	}
+	
 	function getId() { return $this->id; }
 	function getName() { return $this->name; }
 	function getWhereColumn() { return $this->whereColumn; }
@@ -643,8 +659,22 @@ class ApiExtension {
 	function getSubGroupId() { return $this->subGroupId; }
 	function isListOfValues() { return $this->listOfValues; }
 	
+	function sqlInject($value) {
+		$value=str_replace('\\\\', '', $value);
+		$value=str_replace("'", "\'", $value);
+		$value=str_replace('"', '\"', $value);
+		$value=stripslashes($value);
+		return $value;
+	}
+	
+	function getDateSet() {
+		$date="";
+		if(!empty($this->dateColumn)) { $date=", ".$this->dateColumn."='".$this->sqlInject($this->date)."'"; }
+		return $date;
+	}
+	
 	function getInsert($id) {
-		return "INSERT INTO ".$this->table." SET ".$this->whereColumn."=".intval($id).", ";
+		return "INSERT INTO ".$this->table." SET ".$this->whereColumn."=".intval($id).$this->getDateSet().", ";
 	}
 	
 	function getSelect($whereArray) {
@@ -655,7 +685,7 @@ class ApiExtension {
 			$columns.=$item->getSqlName();
 		}
 		$sql="SELECT ".$columns." from ".$this->table." WHERE ".$this->whereColumn." IN(".implode(',',$whereArray).") ORDER BY ".$this->whereColumn." ASC, ".$this->orderby;
-		//echo $sql;
+		//echo $sql."\n"; 
 		return $sql;
 	}
 }

@@ -24,19 +24,9 @@ foreach($uuid as &$u) {
 		$id=$r['id'];
 	}
 
-	if($id && !empty($_GET['category'])) {
-		$exists=false;
-		$select=mysqli_query($db, "select id from url_group WHERE groupname='".$category."' and id_url=".intval($id)." limit 0,1");
-		while($r=mysqli_fetch_array($select)) {	
-			$exists=$r['id'];
-		}
-		if(!$exists) { 
-			mysqli_query($db, "INSERT into url_group SET groupname='".$category."', id_url=".intval($id)); 
-			$status=true;
-		}
-		
-	} elseif($id) {
-		mysqli_query($db, "DELETE from url_group WHERE id_url=".intval($id));
+	if($id) {
+		//mysqli_query($db, "DELETE from url WHERE id=".intval($id));
+		mysqli_query($db, "UPDATE url set url='' WHERE id=".intval($id));
 		$status=true;
 	}
 }

@@ -1,6 +1,5 @@
 <script>
   import { Button, Dialog } from 'svelte-mui/src';
-  import Autocomplete from '@smui-extra/autocomplete';
   import Loading from "../components/Loading.svelte";
   import IoIosAdd from 'svelte-icons/io/IoIosAdd.svelte'
   import { api, db } from "../ConfigService.js";
@@ -8,12 +7,11 @@
   export let visible = false;
   export let uuid;
   export let type;
-  export let category=false;
   export let needsUpdate;
-  let value="";
+  export let active="";
   
   async function save() {
-  	const response = await fetch($api+'action/group/?category='+value+'&db='+$db, {
+  	const response = await fetch($api+'action/removeFromGroup/?category='+active+'&db='+$db, {
 		method: 'POST',
 		body: JSON.stringify({
 			uuid
@@ -24,18 +22,10 @@
   	if(await response.json()) { needsUpdate=true; }
 	return await response.json()
   }
-  
-  function getGroups(groups) {
-  	let out=[];
-  	for(let i=0; i<groups.length; i++) {
-  		out.push(groups[i]);
-  	}	
-  	return out;
-  }
 
 
  $: {
-	if(uuid && type=="category" && category) { visible=true; }
+	if(uuid && type=="removeFromCategory") { visible=true; }
  }
  
  function close() {
@@ -47,15 +37,11 @@
 </script>
 
 <Dialog width="600" bind:visible>
-    <div slot="title">Zařazení do kategorie</div>
-{#if category}	
-	<div style="text-align:center; margin:auto; min-height:200px;">
-		<Autocomplete combobox options={getGroups(category)} bind:value label="Název kategorie" />	
-	</div>
-{/if}
+    <div slot="title">Odstranění z kategorie</div>
+	<b>Opravdu si přejete odstranit vybrané položky z této kategorie?</b>
     <div slot="actions" class="actions center">
-   	<Button color="primary" raised on:click="{()=>(save())}">Uložit</Button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <Button outlined on:click="{()=>(close())}">Zavřít</Button>
+   	<Button color="accent" raised on:click="{()=>(save())}">ODSTRANIT</Button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <Button outlined on:click="{()=>(close())}">Zrušit</Button>
     </div>
 </Dialog>
 

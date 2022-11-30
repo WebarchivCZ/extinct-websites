@@ -7,10 +7,11 @@
 
 <select bind:value={limit}>
 	{#each items as i}
-		<option value={i}>{i} položek</option>
+		<option value={i}>{i}</option>
 	{/each}
 </select>
 
 <style>
 select {float:right; }
+select { min-height:45px !important; }
 </style>
