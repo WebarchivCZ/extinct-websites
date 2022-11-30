@@ -3,7 +3,7 @@
   import Loading from "../components/Loading.svelte";
   import IoIosAdd from 'svelte-icons/io/IoIosAdd.svelte'
   import Icon from "./Icons.svelte";
-  import { api, db } from "../ConfigService.js";
+  import { apiCheck, db } from "../ConfigService.js";
 
   export let visible = false;
   let data;
@@ -16,7 +16,7 @@
  
   async function update() {
 	    if(url && (type=="verify")) {
-		const res = await fetch("http://10.3.0.24/autocheck/?url="+url);	//$api+"?db="+$db
+		const res = await fetch($apiCheck+"/?url="+url+"?db="+$db);
 		data = await res.json();
 		visible=true;
 	    }
