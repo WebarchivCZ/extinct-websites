@@ -12,7 +12,8 @@ if(!empty($_GET['uuid'])) { $uuid[]=strval($_GET['uuid']); }
 else {
 	$get = file_get_contents('php://input');
 	$data = json_decode($get, true, 512, JSON_OBJECT_AS_ARRAY);
-	$uuid[] = $data['uuid'];
+	if(is_array($data['uuid'])) { $uuid = $data['uuid']; }
+	else { $uuid[] = $data['uuid']; }
 }
 
 foreach($uuid as $u) {

@@ -108,6 +108,7 @@ class URL {
 	function replaceUrl($url) {
 		$replace=array("https://", "http://", "'", '"'. "\\");
 		$u=explode("/", str_replace($replace, "", $url));
+		$u=explode("?", $u[0]);
 		return $u[0];
 	}
 

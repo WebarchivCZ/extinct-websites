@@ -12,7 +12,7 @@
   export let needsUpdate;
   let getFromObject=false;
   
-  const titles = {url:"Adresa", dead:"Mrtvý", deadIndex:"Index úmrtí", manualCheck:"Vyžadována ruční kontrola", code:"Poslední stavový kód", redirect:"Počet přesměrování", redirectToAnotherDomain:"Přesměrování na jinou doménu", pagedata_diff:"Rozdílná metadata", pagedata_count:"Počet metadat", whois_diff:"Rozdílné Whois", whois_count:"Počet Whois"};
+  const titles = {url:"Adresa", dead:"Mrtvý", deadIndex:"Index úmrtí", manualCheck:"Vyžadována ruční kontrola", code:"Poslední stavový kód", redirect:"Počet přesměrování", redirectToAnotherDomain:"Přesměrování na jinou doménu", pagedata_diff:"Rozdílná metadata", pagedata_count:"Počet metadat", pagedata:"Aktuální metadata", whois_diff:"Rozdílné Whois", whois_count:"Počet Whois", whois:"Aktuální whois"};
  
   async function update() {
 	    if(url && (type=="verify")) {
@@ -53,6 +53,22 @@
  	return false;
  }
 
+ function objectIntoLines(obj) {
+ 	let out="";
+ 	if(typeof obj !== "object") { return obj; }
+	for(const [key, value] of Object.entries(obj)) {
+		if(typeof value !== "object") { out+=value+"\n"; }
+		else {
+			let first=true;
+			for(const [key2, value2] of Object.entries(value)) {
+				if(first) { first=false; } else { out+=", "; }
+				out+=value2.replaceAll(",", ", ");
+			}
+		}
+	}
+ 	return out;
+ }
+
 </script>
 
 <Dialog width="85%" bind:visible style="overflow-x: auto !important; min-width:400px;">
@@ -67,12 +83,13 @@
 				{#each Object.entries(value) as [key2, value2]}
 					{#if isNotEmpty(value2)}
 						<div class="subcategory	">
-						<span class="key">{translate(key2)}:</span> 
+						<span class="key">{translate(key2)}:</span>
 						{#if typeof(value2) === 'object'}
+							<br>
 							{#each Object.entries(value2) as [key3, value3]}
 								{#if isNotEmpty(value3)}
-									<span class="key">{translate(key3)}:</span> 
-									{value3}<br>
+									<span class="key">&nbsp;&nbsp;&nbsp;&#x25B6;&nbsp;{translate(key3)}:</span> 
+									{objectIntoLines(value3)}<br>
 								{/if}
 							{/each}
 						{:else}

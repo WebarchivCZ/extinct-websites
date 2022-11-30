@@ -42,11 +42,11 @@ function check($url) {
 		foreach($data1 as $key=>$d) {
 			if(!empty($data2)) {
 				$status['pagedata_diff'][$key]=array_diff($data1[$key][0], $data2[$key][0]);
-				$status['pagedata_diff'][$key]+=array_diff($data2[$key][0], $data1[$key][0]);
+				//$status['pagedata_diff'][$key]+=array_diff($data2[$key][0], $data1[$key][0]);
 			}
 			if(!empty($data3)) {
 				$status['pagedata_diff'][$key]+=array_diff($data1[$key][0], $data3[$key][0]);
-				$status['pagedata_diff'][$key]+=array_diff($data3[$key][0], $data1[$key][0]);
+				//$status['pagedata_diff'][$key]+=array_diff($data3[$key][0], $data1[$key][0]);
 			}
 			$status['pagedata_count'][$key]=count($data1[$key][0]);
 			//definice skóre
@@ -92,6 +92,11 @@ function check($url) {
 			$status['deadIndex']+=round(count($status['pagedata_diff'][$key])*$percent*$score);
 			*/
 		}
+		if(DEBUG) { 
+			$status['pagedata'][]=$data1; 
+			$status['pagedata'][]=$data2; 
+			$status['pagedata'][]=$data3; 
+		}
 		
 		//whois
 		$whois1=$url->getWhois(0);
@@ -110,6 +115,11 @@ function check($url) {
 			
 			//přičtení indexu
 			$status['deadIndex']+=count($status['whois_diff'][$key])*5;
+		}
+		if(DEBUG) { 
+			$status['whois'][]=$whois1; 
+			$status['whois'][]=$whois2; 
+			$status['whois'][]=$whois3; 
 		}
 
 	}

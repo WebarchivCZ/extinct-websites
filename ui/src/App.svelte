@@ -60,6 +60,11 @@
 	changePageIfNotExists(await data);
   }
   
+  async function updateGroups() {
+  	const response = await fetch($api+'groups/?db='+$db);
+	groups = await response.json();
+  }
+  
   function changePageIfNotExists(d) {
   	if(data.stats) {
   		if(data.stats.sum) {
@@ -86,6 +91,7 @@
  	if(active) { loadData(filterUrl, filterType, page, limit, filterDateFrom, filterDateTo); }
  	if(needsUpdate) { 
  		loadData(needsUpdate); 
+ 		updateGroups(needsUpdate);
  		needsUpdate=0;
  	}
  }
@@ -167,7 +173,7 @@
 				    <div class="float-right">
 				    	<Pagination 
 				    		bind:page
-				    		records="{data.stats.sum}"
+				    		bind:records="{data.stats.sum}"
 				    		maxPages=6
 				    		bind:limit		    	
 				    	/>				    

@@ -11,6 +11,7 @@
  	pages=[];
  	let pagesBefore=0;
  	let pagesAfter=0;
+ 	countPage=Math.ceil(records/limit);
  	
  	pagesAfter=page+Math.round(maxPages/2);
  	if(pagesAfter>=countPage) {
@@ -27,17 +28,6 @@
  	for(let i=pagesBefore; i<=pagesAfter; i++) {
  		pages[pages.length]=i; 
  	}
- 	/*
- 	for(let i=(page-Math.ceil(maxPages/2)); i<=page; i++) {
- 		if(i>0 && (i<=Math.ceil(records/limit))) { pages[pages.length]=i; }
- 	}
- 	if(pages.length>0) { pages[pages.length]=0; }
- 	
- 	for(let i=(page+1); i<(page+Math.ceil(maxPages/2)+1); i++) {
- 		if(i<=Math.ceil(records/limit)) { pages[pages.length]=i; }
- 	}
- 	*/
- 	console.log(pages);
  	return "";
  }
  
@@ -49,6 +39,7 @@
   $: {
  	if(page>countPage) { page=countPage; }
  	else if(page<=0) { page=1; }
+ 	if(records) { getPages(records); }
  }
  
 </script>
