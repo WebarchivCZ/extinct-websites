@@ -22,20 +22,20 @@ Logparser - skript pro analýzu dat z logů archivovaných webových stránek
 
 # **Začínáme**
 ## **Prerekvizity**
-* **Operační systém Linux**
-* **Webový server Apache 2**
-* **PHP 7 (podpora php-json)**
-* **Databáze MySQL v8**
-* **Python 3.9+**
+* Operační systém Linux
+* Webový server Apache 2
+* PHP 7 (podpora php-json)
+* Databáze MySQL v8
+* Python 3.9+
 
 
 ## **Instalace**
-* **Zazipovanou aplikaci (extinctWebsitesApp.zip) stačí rozbalit do adresáře, kam je nakonfigurován webový server (nejčastěji /var/www)**
-* **Dále je potřeba nahrát všechny PHP skripty ze složky server do stejného webového adresáře**
-* **V MySQL je potřeba vytvořit novou databázi a naiportovat soubor “extinctWebsites.sql”**
-* **Přihlašovací údaje je třeba vyplnit v PHP skriptu “connect.php” a nahrát ho do hlavního webového adresáře**
-* **Automatické spouštění ověřování živosti webů lze cronem - např.:
-      4       *       *       *       /usr/bin/php /var/www/autocheck/checkAll.php &> /dev/null**
+* Zazipovanou aplikaci (extinctWebsitesApp.zip) stačí rozbalit do adresáře, kam je nakonfigurován webový server (nejčastěji /var/www)
+* Dále je potřeba nahrát všechny PHP skripty ze složky server do stejného webového adresáře
+* V MySQL je potřeba vytvořit novou databázi a naiportovat soubor “extinctWebsites.sql”
+* Přihlašovací údaje je třeba vyplnit v PHP skriptu “connect.php” a nahrát ho do hlavního webového adresáře
+* Automatické spouštění ověřování živosti webů lze cronem - např.:
+      4       *       *       *       /usr/bin/php /var/www/autocheck/checkAll.php &> /dev/null
 
 
 ## **Theory, testing and curation**
