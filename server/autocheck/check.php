@@ -40,8 +40,10 @@ function check($url) {
 		*/
 		
 		foreach($data1 as $key=>$d) {
-			$status['pagedata_diff'][$key]=array_diff($data1[$key][0], $data2[$key][0]);
-			$status['pagedata_diff'][$key]+=array_diff($data2[$key][0], $data1[$key][0]);
+			if(!empty($data2)) {
+				$status['pagedata_diff'][$key]=array_diff($data1[$key][0], $data2[$key][0]);
+				$status['pagedata_diff'][$key]+=array_diff($data2[$key][0], $data1[$key][0]);
+			}
 			if(!empty($data3)) {
 				$status['pagedata_diff'][$key]+=array_diff($data1[$key][0], $data3[$key][0]);
 				$status['pagedata_diff'][$key]+=array_diff($data3[$key][0], $data1[$key][0]);
@@ -96,9 +98,11 @@ function check($url) {
 		$whois2=$url->getWhois(1);
 		$whois3=$url->getWhois(2);
 		foreach($whois1 as $key=>$w) {
-			$status['whois_diff'][$key]=array_diff($whois1[$key][0], $whois2[$key][0]);
-			$status['whois_diff'][$key]=array_diff($whois2[$key][0], $whois1[$key][0]);
-			if(!empty($data3)) {
+			if(!empty($whois2)) {
+				$status['whois_diff'][$key]=array_diff($whois1[$key][0], $whois2[$key][0]);
+				$status['whois_diff'][$key]=array_diff($whois2[$key][0], $whois1[$key][0]);
+			}
+			if(!empty($whois3)) {
 				$status['whois_diff'][$key]=array_diff($whois1[$key][0], $whois3[$key][0]);
 				$status['whois_diff'][$key]=array_diff($whois3[$key][0], $whois1[$key][0]);
 			}
