@@ -25,4 +25,23 @@ WebBeat - aplikace pro extrakci obsahových, síťových a infrastrukturních da
 ## **Začínáme**
 ## **Prerekvizity**
 ## **Instalace**
-## **Vývoj** 
+
+## **Theory, testing and curation**
+* **Marie Haškovcová** -  *programme lead*
+* **Luboš Svoboda** -  *theory and testing*
+* **Zdenko Vozár** -  *architecture*
+
+## **Developement**
+
+* **Jan Holomek** - *front-end app, db managment*
+* **Petra Habetinova** -  *back-end app for logparsing*
+* **Zdenko Vozár** -  *back-end app WebBEAT*
+
+
+## Dedication
+
+For Webarchive of the National Library of the Czech Republic
+
+## Supported by
+
+_Realizováno v rámci institucionálního výzkumu Národní knihovny České republiky financovaného Ministerstvem kultury ČR v rámci Dlouhodobého koncepčního rozvoje výzkumné organizace._
