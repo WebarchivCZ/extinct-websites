@@ -34,28 +34,25 @@ Logparser - skript pro analýzu dat z logů archivovaných webových stránek
 * Dále je potřeba nahrát všechny PHP skripty ze složky server do stejného webového adresáře
 * V MySQL je potřeba vytvořit novou databázi a naiportovat soubor “extinctWebsites.sql”
 * Přihlašovací údaje je třeba vyplnit v PHP skriptu “connect.php” a nahrát ho do hlavního webového adresáře
-* Automatické spouštění ověřování živosti webů lze cronem - např.:
-      4       *       *       *       /usr/bin/php /var/www/autocheck/checkAll.php &> /dev/null
+* Automatické spouštění ověřování živosti webů lze cronem - např.: *      4       *       *       *       /usr/bin/php /var/www/autocheck/checkAll.php &> /dev/null
 
 
-## **Theory, testing and curation**
-* **Marie Haškovcová** -  *programme lead*
-* **Luboš Svoboda** -  *theory and testing*
-* **Zdenko Vozár** -  *architecture*
+## **Koncepce**
 
-## **Developement**
+* **Marie Haškovcová** -  *koncepce, teorie*
+* **Luboš Svoboda** -  *koncepce, teorie, testování*
+* **Zdenko Vozár** -  *architektura*
+
+## **Vývoj**
 
 * **Jan Holomek** - *front-end app, db managment*
-* **Petra Habetinova** -  *back-end app for logparsing*
+* **Petra Habetinova** -  *back-end app Logparser*
 * **Zdenko Vozár** -  *back-end app WebBEAT*
 
 ## **Více**
 Více informací a uživatelský manuál naleznete zde: https://github.com/WebarchivCZ/extinct-websites/wiki
 
-## Dedication
-
-For Webarchive of the National Library of the Czech Republic
-
-## Supported by
+## Dedikace
+Národní knihovna ČR
 
 _Realizováno v rámci institucionálního výzkumu Národní knihovny České republiky financovaného Ministerstvem kultury ČR v rámci Dlouhodobého koncepčního rozvoje výzkumné organizace._
