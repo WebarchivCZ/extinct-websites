@@ -16,6 +16,7 @@ Aplikace byla navržena pro potřeby Českého webového archivu NK ČR (Webarch
 
 ## **Skladba**
 WebBeat - skript pro extrakci obsahových, síťových a infrastrukturních dat z webových stránek
+
 Logparser - skript pro analýzu dat z logů archivovaných webových stránek
 
 
@@ -34,7 +35,7 @@ Logparser - skript pro analýzu dat z logů archivovaných webových stránek
 * **V MySQL je potřeba vytvořit novou databázi a naiportovat soubor “extinctWebsites.sql”**
 * **Přihlašovací údaje je třeba vyplnit v PHP skriptu “connect.php” a nahrát ho do hlavního webového adresáře**
 * **Automatické spouštění ověřování živosti webů lze cronem - např.:
-*      4       *       *       *       /usr/bin/php /var/www/autocheck/checkAll.php &> /dev/null**
+      4       *       *       *       /usr/bin/php /var/www/autocheck/checkAll.php &> /dev/null**
 
 
 ## **Theory, testing and curation**
@@ -48,6 +49,8 @@ Logparser - skript pro analýzu dat z logů archivovaných webových stránek
 * **Petra Habetinova** -  *back-end app for logparsing*
 * **Zdenko Vozár** -  *back-end app WebBEAT*
 
+## **Více**
+Více informací a uživatelský manuál naleznete zde: https://github.com/WebarchivCZ/extinct-websites/wiki
 
 ## Dedication
 
