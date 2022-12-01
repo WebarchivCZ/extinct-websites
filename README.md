@@ -41,7 +41,7 @@ Logparser - skript pro analýzu dat z logů archivovaných webových stránek
 
 * **Marie Haškovcová** -  *koncepce, teorie*
 * **Luboš Svoboda** -  *koncepce, teorie, testování*
-* **Zdenko Vozár** -  *architektura*
+* **Zdenko Vozár** -  *architektura řešení*
 
 ## **Vývoj**
 
