@@ -2,6 +2,17 @@
 
 <img width="1066" alt="Snímek obrazovky 2022-11-29 v 18 40 09" src="https://user-images.githubusercontent.com/62152053/204602538-963f65a9-cccf-4627-8c86-8e15203b3b8b.png">
 
+## About App
+
+The application serves as an automated solution for identifying and describing "dead sites" and then stores them in its own database and makes them available to curators who further manipulate, interpret and classify the information in the database.
+
+In the first plan, the application identifies "dead sites" using status codes, according to which it categorizes the sites into groups that automate other processes such as verifying metadata from live sites, the WhoIS database, or historical metadata. The application identifies "dead sites" up to the level of 3rd order domains.
+
+The application helps us grasp the concept of dead web, which is beneficial in terms of web archiving practice. In fact, by identifying the topology of the dead web and anchoring the term, it will be possible to monitor the disappearing sites in the long term and thus obtain an exclusive report on the disappearing web landscape.
+
+The application was designed for the needs of the Czech Web Archive of the Czech Republic (Webarchiv). It can be used by web archives and memory institutions to streamline the monitoring of archival data.
+
+Translated with www.DeepL.com/Translator (free version)
 
 ## O aplikaci
 
