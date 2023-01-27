@@ -12,7 +12,6 @@ The application helps us grasp the concept of dead web, which is beneficial in t
 
 The application was designed for the needs of the Czech Web Archive of the Czech Republic (Webarchiv). It can be used by web archives and memory institutions to streamline the monitoring of archival data.
 
-Translated with www.DeepL.com/Translator (free version)
 
 ## O aplikaci
 
