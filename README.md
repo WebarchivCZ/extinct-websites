@@ -60,7 +60,7 @@ Logparser - skript pro analýzu dat z logů archivovaných webových stránek
 * **Zdenko Vozár** -  *back-end app WebBEAT*
 
 ## **Více**
-Více informací a uživatelský manuál naleznete zde: https://github.com/WebarchivCZ/extinct-websites/wiki
+Více informací a uživatelský manuál naleznete zde: https://github.com/WebarchivCZ/extinct-websites/wiki, https://github.com/WebarchivCZ/extinct-websites/wiki/Popis-aplikace
 
 ## Dedikace
 Národní knihovna ČR
