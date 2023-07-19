@@ -12,12 +12,15 @@
   	import VerifyDialog from "./components/VerifyDialog.svelte";
   	import DateRange from "./components/DateRange.svelte";
   	import DeleteDialog from "./components/DeleteDialog.svelte";
+  	import AddUrlDialog from "./components/AddUrlDialog.svelte";
+  	import AutoCheckDialog from "./components/AutoCheckDialog.svelte";
   	import CategorizeDialog from "./components/CategorizeDialog.svelte";
   	import RemoveFromCategory from "./components/RemoveFromCategory.svelte";
   	import DeadDialog from "./components/DeadDialog.svelte";
   	import Icon from "./components/Icons.svelte";
   	import Pagination from "./components/Pagination.svelte";
   	import LimitSelect from "./components/LimitSelect.svelte";
+  	import Notify from "./components/Notify.svelte";
   	import { api, db } from "./ConfigService.js";
 
   export let urlPath = "";
@@ -35,6 +38,7 @@
   export let page=1;
   export let limit=15;
   
+  export let notify="";
   export let needsUpdate=false;
   
   export let tab=false;
@@ -78,7 +82,7 @@
   	let out=[];
   	out[0]="VŠE";
   	for(let i=0; i<groups.length; i++) {
-  		out.push(groups[i]);
+  		if(groups[i]!=out[0]) { out.push(groups[i]); }
   	}	
   	return out;
   }
@@ -90,16 +94,33 @@
  $: {
  	if(active) { loadData(filterUrl, filterType, page, limit, filterDateFrom, filterDateTo); }
  	if(needsUpdate) { 
+ 		checkbox=[];
  		loadData(needsUpdate); 
  		updateGroups(needsUpdate);
  		needsUpdate=0;
  	}
  }
  
+  async function addRequest() {
+  	const response = await fetch($api+'action/addRequest/?db='+$db, {
+		method: 'POST',
+		body: JSON.stringify({
+			uuid
+		})
+	});
+  	if(await response.json()) { 
+  		//needsUpdate=true;
+  		checkbox=[]; 
+  		notify = "Proces kontroly byl naplánován!";
+  	}
+  }
+ 
+ 
  function openDialog(u, t, a) {
   	type=t;
  	uuid=u;
  	url=a;
+ 	if(t=="request") { addRequest(); }
  }
  
  function getUrl(url) {
@@ -118,6 +139,18 @@
  function getMetadataStyle(value, date) {
  	if(value=="0" || date && !value) { return "color:silver"; }
  	return "";
+ }
+ 
+ function selectAll(d) {
+ 	if(checkbox.length==d['data'].length) {
+	 	checkbox=[];
+ 	
+ 	} else {
+	 	for(let i=0; i<d['data'].length; i++) {
+	 		checkbox[i]=d['data'][i]['UUID'];
+	 	}
+	}
+ 	return false;
  }
  
 </script>
@@ -151,7 +184,7 @@
 	  
 	  <br><br>
 	  {#if data}
-		<div class="container-fluid">
+		<div class="container-fluid" style="max-width:1270px!important;">
 		    <div class="card bg-light mb-2 overflow-hidden">
 			<div class="card-header px-2 py-0">
 			    <div class="float-left">
@@ -261,12 +294,28 @@
 					<Button on:click={() => (openDialog(checkbox, "unknown", false))} variant="raised">
 					  <Label>Označit za mrtvé / živé</Label>
 					</Button>
+					<Button on:click={() => (openDialog(checkbox, "request", false))} variant="raised">
+					  <Label>Vyžádat kontrolu</Label>
+					</Button>
+					<br><br><a href="#" onclick="return false;" on:click={() => selectAll(data)}>Vybrat vše / zrušit výběr</a>
 				</div>
 				<Button on:click={() => window.open($api+'?db='+$db+'&page='+(page-1)+'&limit='+limit+getParams(), "_blank")} variant="unelevated" color="secondary">
 				  <Label>Zobrazit data jako JSON</Label>
 				</Button>
 			</div>
 		    </div>
+		    <br />
+		    <div style="margin:auto;text-align:center;">
+		    	  {#if active && active!="VŠE"}
+				  <Button on:click={() => (openDialog(false, "autoCheck", false))} variant="raised">
+				  	<Label>Nastavit automatickou kontrolu</Label>
+				  </Button>
+			  {/if}
+			  <Button on:click={() => (openDialog(false, "addUrl", false))} variant="raised">
+			  	<Label>Přidat URL</Label>
+			  </Button>
+		</div>
+		<br /><br />
 		    
 	  {:else}
 	  	<Loading />
@@ -276,14 +325,17 @@
 	<CategorizeDialog bind:uuid bind:type bind:needsUpdate category={groups} />
 	<RemoveFromCategory bind:uuid bind:type bind:needsUpdate bind:active />
 	<DeleteDialog bind:uuid bind:type bind:needsUpdate />
+	<AddUrlDialog bind:active bind:type bind:needsUpdate />
+	<AutoCheckDialog bind:active bind:type />
 	<DeadDialog bind:uuid bind:type bind:needsUpdate bind:url data={data} />
 {/await}
 <DataDialog bind:uuid bind:url bind:type />
 <VerifyDialog bind:url bind:type bind:needsUpdate />
+<Notify bind:notify />
 
 </main>
 <footer>
-	Extinct Websites v1.0
+	Extinct Websites v1.1
 </footer>
 
 <style>

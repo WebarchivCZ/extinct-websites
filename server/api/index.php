@@ -95,6 +95,19 @@ if($_GET['type']=="app") {
 		$api->setExtensionDate(date("Y-m-d"));
 		$api->addExtensionItem("type");
  		$api->addExtensionItem("value");
+ 		
+ 	//stav webu
+	$api->addGroup("status");
+		$api->addSubItem("dead");
+		$api->addSubItem("confirmed");
+		$api->addSubItem("requires");	
+		$api->addSubItem("metadata");	
+		$api->addSubItem("metadata_match");
+		$api->addSubItem("whois");		
+		$api->addSubItem("date");
+		
+ 	$api->addGroup("exticint");
+		$api->addSubItem("date", false, "exticintDate");
  	
 }
 
@@ -136,7 +149,7 @@ else { $data=$api->getData(); }
 
 $out["data"]=$data;
 $out["stats"]["sum"]=$api->getSum($db, $where, $join);
-if(DEBUG) { $out["stats"]["query"]=$api->getSqlQuery($where, $order, $from, $limit, $join); }
+if(DEBUG) { $out["stats"]["query"]=str_replace(array("\n", "\t"), "", $api->getSqlQuery($where, $order, $from, $limit, $join)); }
 
 echo json_encode($out);
 

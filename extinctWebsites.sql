@@ -1,4 +1,4 @@
--- Adminer 4.8.0 MySQL 8.0.31-0ubuntu0.20.04.1 dump
+-- Adminer 4.8.0 MySQL 8.0.32-0ubuntu0.20.04.2 dump
 
 SET NAMES utf8;
 SET time_zone = '+00:00';
@@ -92,6 +92,18 @@ CREATE TABLE `page_data` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
 
 
+DROP TABLE IF EXISTS `request`;
+CREATE TABLE `request` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_url` int NOT NULL,
+  `date` datetime NOT NULL,
+  `finished` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_url` (`id_url`),
+  CONSTRAINT `request_ibfk_1` FOREIGN KEY (`id_url`) REFERENCES `url` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+
+
 DROP TABLE IF EXISTS `status`;
 CREATE TABLE `status` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -134,6 +146,8 @@ CREATE TABLE `url_group` (
   `id` int NOT NULL AUTO_INCREMENT,
   `id_url` int NOT NULL,
   `groupname` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
+  `autocheck` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
+  `lastcheck` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_url` (`id_url`),
   CONSTRAINT `url_group_ibfk_1` FOREIGN KEY (`id_url`) REFERENCES `url` (`id`)
@@ -153,4 +167,5 @@ CREATE TABLE `whois` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
 
 
--- 2022-11-30 03:06:36
+-- 2023-07-19 14:28:04
+

@@ -46,7 +46,7 @@
  
 </script>
 
-<Dialog width="600" bind:visible>
+<Dialog width="600" bind:visible beforeClose={()=>close()}>
     <div slot="title">Zařazení do kategorie</div>
 {#if category}	
 	<div style="text-align:center; margin:auto; min-height:200px;">

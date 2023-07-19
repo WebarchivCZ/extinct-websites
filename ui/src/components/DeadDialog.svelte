@@ -52,7 +52,7 @@
  
 </script>
 
-<Dialog width="600" bind:visible>
+<Dialog width="600" bind:visible beforeClose={()=>close()}>
     <div slot="title">Označení mrtvého webu</div>
 {#if data}	
 	{#if url}

@@ -61,7 +61,7 @@
  
 </script>
 
-<Dialog width="85%" bind:visible style="overflow-x: auto !important; min-width:400px;">
+<Dialog width="85%" bind:visible style="overflow-x: auto !important; min-width:400px;" beforeClose={()=>close()}>
     <div slot="title">
     	Zobrazení dat<br>
     	<small>{url}</small>

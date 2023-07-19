@@ -5,42 +5,45 @@
   import { api, db } from "../ConfigService.js";
 
   export let visible = false;
-  export let uuid;
+  export let url;
   export let type;
+  export let active;
   export let needsUpdate;
-  export let active="";
   
   async function save() {
-  	const response = await fetch($api+'action/removeFromGroup/?category='+active+'&db='+$db, {
+  	let group=active;
+  	if(group=="VŠE") { group=""; }
+  	const response = await fetch($api+'action/addUrl/?db='+$db, {
 		method: 'POST',
 		body: JSON.stringify({
-			uuid
+			url:url.replace(",,",",").replace("\n",",").replace(" ",","),
+			group
 		})
 	});
-  	close();
-  	uuid=false;
   	if(await response.json()) { needsUpdate=true; }
+  	close();
 	return await response.json()
   }
 
 
  $: {
-	if(uuid && type=="removeFromCategory") { visible=true; }
+	if(type=="addUrl") { visible=true; }
  }
  
  function close() {
- 	uuid=false;
  	visible=false;
+ 	type=false;
  }
  
  
 </script>
 
 <Dialog width="600" bind:visible beforeClose={()=>close()}>
-    <div slot="title">Odstranění z kategorie</div>
-	<b>Opravdu si přejete odstranit vybrané položky z této kategorie?</b>
+    <div slot="title">Přidání URL do kategorie {active}</div>
+	<textarea bind:value="{url}" />
+	
     <div slot="actions" class="actions center">
-   	<Button color="accent" raised on:click="{()=>(save())}">ODSTRANIT</Button>&nbsp;&nbsp;&nbsp;&nbsp;
+   	<Button color="primary" raised on:click="{()=>(save())}">Přidat</Button>&nbsp;&nbsp;&nbsp;&nbsp;
         <Button outlined on:click="{()=>(close())}">Zrušit</Button>
     </div>
 </Dialog>
@@ -48,6 +51,7 @@
 
 <style>
 a { cursor:pointer; }
+textarea { width:99%; min-height:300px; }
 .outlined { height:60px; }
 .key { font-weight:bold; }
 .subcategory { margin-left:50px; }

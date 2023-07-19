@@ -15,7 +15,7 @@ class Sql {
 	}
 	
 	function addRow($name, $value=false, $unique=false) {
-		if(!$value && $this->inputData) { $value=$this->inputData[$name]; }
+		if(!$value && is_bool($value) && $this->inputData) { $value=$this->inputData[$name]; }
 		$this->rows[]=new SqlRow($name, $this->sqlInject($value));
 		if($unique) { $this->checkIfExists($name, $value); }
 	}
@@ -28,6 +28,16 @@ class Sql {
 		}
 		//echo "INSERT into ".$this->table." SET ".$l."\n";
  		mysqli_query($this->connection, "INSERT into ".$this->table." SET ".$l);
+	}
+	
+	function update($col, $val, $whereCol, $whereVal) {
+		$set=$col."='".$this->sqlInject($val)."'";
+		if($val=="") { $set=$col; }
+		
+		$where=$whereCol."='".$this->sqlInject($whereVal)."'";
+		if($whereVal=="") { $where=$whereCol; }
+		
+ 		mysqli_query($this->connection, "UPDATE ".$this->table." SET ".$set." WHERE ".$where);
 	}
 	
 	function checkIfExists($name, $value) {

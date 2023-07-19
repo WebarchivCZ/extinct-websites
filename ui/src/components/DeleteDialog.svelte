@@ -35,7 +35,7 @@
  
 </script>
 
-<Dialog width="600" bind:visible>
+<Dialog width="600" bind:visible beforeClose={()=>close()}>
     <div slot="title">Odstranění z databáze</div>
 	<b>Opravdu si přejete odstranit vybrané položky z databáze?</b>
     <div slot="actions" class="actions center">
