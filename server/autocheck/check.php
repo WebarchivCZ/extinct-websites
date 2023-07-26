@@ -155,7 +155,7 @@ function check($url, $uuid=false) {
 		//uložení do databáze mrtvých webů
 		if($status['dead']) {
 			$exists=false;
-			$select=mysqli_query($db, "select id from exticint where id_url=".$url->getUrlId());
+			$select=mysqli_query($GLOBALS['db'], "select id from exticint where id_url=".$url->getUrlId()." limit 0,1");
 			while($r=mysqli_fetch_array($select)) {
 				$exists=$r['id'];
 			}
