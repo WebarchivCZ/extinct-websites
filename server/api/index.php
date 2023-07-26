@@ -1,8 +1,10 @@
 <?php
 header("Content-Type: application/json");
 header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Methods: GET, POST");
 
 include $_SERVER['CONTEXT_DOCUMENT_ROOT']."/connect.php";
+include $_SERVER['CONTEXT_DOCUMENT_ROOT']."/autocheck/check.php";
 include "../fce.php";
 include "./api.class.php";
 
@@ -144,8 +146,16 @@ if(!empty($_GET['kat'])) {
 
 $api->loadData($db, $where, '', $from, $limit, $join);
 $import=$api->import($db);	
-if($import) { $data=$import; }
-else { $data=$api->getData(); }
+if($import) { 
+	$data=$import; 
+	if(!empty($data)) {
+		foreach($data as &$uuid) {
+			check(false, $uuid);
+		}
+	}
+} else { 
+	$data=$api->getData(); 
+}
 
 $out["data"]=$data;
 $out["stats"]["sum"]=$api->getSum($db, $where, $join);

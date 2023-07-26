@@ -16,7 +16,7 @@
  
   async function update() {
 	    if(url && (type=="verify")) {
-		const res = await fetch($apiCheck+"/?url="+url+"?db="+$db);
+		const res = await fetch($apiCheck+"/?url="+url+"&db="+$db);
 		data = await res.json();
 		visible=true;
 	    }
@@ -24,7 +24,6 @@
 
  $: {
  	update(url, type);
- 	if(!visible) { type=false; needsUpdate=true; }
  }
  
  function close() {
@@ -71,7 +70,7 @@
 
 </script>
 
-<Dialog width="85%" bind:visible style="overflow-x: auto !important; min-width:400px;">
+<Dialog width="85%" bind:visible style="overflow-x: auto !important; min-width:400px;" beforeClose={()=>close()}>
     <div slot="title">Ověření dostupnosti webu</div>
 {#await data}
 	<Loading />
@@ -102,6 +101,8 @@
 				<Icon type="ok" />
 			{:else if isBoolean(value) && !value}
 				<Icon type="no" />
+			{:else if key=="url"}
+				<a href="https://{value}" target="web">{value}</a>
 			{:else}
 				{value}
 			{/if}			

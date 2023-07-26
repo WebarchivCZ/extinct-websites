@@ -28,7 +28,7 @@
 	return await response.json()
   }
   
-  async function   removeAutoCheck() {
+  async function removeAutoCheck() {
   	const response = await fetch($api+'action/setAutoCheck/?db='+$db, {
 		method: 'POST',
 		body: JSON.stringify({
@@ -45,12 +45,33 @@
 
 
  $: {
-	if(type=="autoCheck") { visible=true; }
+	if(type=="autoCheck") { 
+		visible=true; 
+		if(active && active!="VŠE") { loadSettings(); }
+	}
  }
  
  function close() {
  	visible=false;
+ 	type=false;
  }
+ 
+  async function loadSettings() {
+  	const response = await fetch($api+'groups/?db='+$db+'&group='+encodeURI(active));
+	const data = await response.json();
+	setDefault(await data);
+  }
+  
+  function setDefault(data) {
+  console.log(data);
+  	if(data) {
+	  	let spl=data[0]['check'].split(" ");
+	  	month=spl[0];
+	  	day=spl[1];
+	  	hour=spl[2];
+	}
+  	
+  }
  
  
 </script>
@@ -60,7 +81,7 @@
 
     <div class="columns margins" style="max-heigth:250px;heigth:250px;">
 	    <Select bind:value={month} label="Měsíc" style="height:400px!important;overflow:scroll;">
-		<Option value="*">Všechny</Option>
+		<Option value="*">Každý</Option>
 		<Option value="1">Leden</Option>
 		<Option value="2">Únor</Option>
 		<Option value="3">Březen</Option>
@@ -76,19 +97,23 @@
 	    </Select>
 	    
 	    <Select bind:value={day} label="Den" style="height:400px!important;overflow:scroll;">
-		<Option value="*">Všechny</Option>
+		<Option value="*">Každý</Option>
 		{#each Array(31) as _, i}
 			<Option value={i+1}>{i+1}</Option>
 	      	{/each}
 	    </Select>
 
 	    <Select bind:value={hour} label="Hodina" style="height:400px!important;overflow:scroll;">
-		<Option value="*">Všechny</Option>
+		<Option value="*">Každá</Option>
 		{#each Array(24) as _, i}
 			<Option value={i}>{i}</Option>
 	      	{/each}
 	    </Select>
     </div>
+    
+    {#if !month && !day && !hour}
+    	<b>Automatická kontrola nebyla dosud nastavena.</b>
+    {/if}
 	
     <br /><br /><br />
     <div slot="actions" class="actions center">

@@ -10,7 +10,7 @@ class URL {
 	private $pagedata;
 	private $whois;
 
-	function __construct($url, $url_id=false) {
+	function __construct($url=false, $url_id=false) {
 		$this->url=$url;
 		$this->url_id=$url_id;
 		$this->codes=array();
@@ -120,9 +120,19 @@ class URL {
 		$this->id=false;
 	}
 	
+	function loadUrlIdByUuid($db, $uuid) {
+		$select=mysqli_query($db, "SELECT id, url from url where uuid LIKE '%".$this->replaceUrl($uuid)."%' limit 0,1");
+		while($r=mysqli_fetch_array($select)) {	
+			$this->url_id=$r['id'];
+			$this->url=$r['url'];
+		}
+		$this->id=false;
+	}
+	
 	
 	//Load Data
-	function loadData($db) {
+	function loadData($db, $uuid=false) {
+		if($uuid) { $this->loadUrlIdByUuid($db, $uuid);  }
 		if(!$this->url_id) { $this->loadUrlId($db); }
 		$this->loadHarvest($db);
 		$this->loadPagedata($db);

@@ -14,7 +14,7 @@
 	export let title="";
 </script> 
 
-<div class="icon" title>
+<div class="icon" title={title}>
 	{#if type=="ok"}
 		<span class="ok bold"><IoIosCheckmark /></span>
 	{:else if type=="no"}
@@ -42,7 +42,7 @@
 </div>
 
 <style>
-	.icon, .icon svg { height:35px!important; max-height:35px!important; display:inline-block; margin-right:10px; bottom:3px; }
+	.icon, .icon svg { height:35px!important; max-height:35px!important; display:inline-block; margin-right:5px; bottom:3px; }
 	.ok { color:green; }
 	.error { color:red; }
 	.silver { color:silver; }

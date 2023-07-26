@@ -34,7 +34,7 @@ CREATE TABLE `exticint` (
 DROP TABLE IF EXISTS `harvest`;
 CREATE TABLE `harvest` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `timestamp` date NOT NULL,
+  `timestamp` datetime NOT NULL,
   `crawler` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci DEFAULT NULL,
   `harvest` text CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci,
   `id_url` int DEFAULT NULL,
@@ -146,7 +146,7 @@ CREATE TABLE `url_group` (
   `id` int NOT NULL AUTO_INCREMENT,
   `id_url` int NOT NULL,
   `groupname` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `autocheck` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
+  `autocheck` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci DEFAULT NULL,
   `lastcheck` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_url` (`id_url`),

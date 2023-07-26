@@ -20,7 +20,7 @@ function handleChange(event) {
 
 export let date=false;
 
-const flatpickrOptionsRange = {
+let flatpickrOptionsRange = {
   mode: "range",
   enableTime: false,
   dateFormat: "d.m.Y",
@@ -38,17 +38,38 @@ function dateToDMY(date) {
     return y+ '-' + (m<=9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d) ;
 }
 
+function reset() {
+	from=false;
+	to=false;
+}
+
 </script>
 
-<div class="range-picker" label="Range picker">
-  <Flatpickr
-    options={flatpickrOptionsRange}
+<div class="float-left range-picker" label="Range picker">
+ <label class="mdc-text-field mdc-text-field--filled mdc-ripple-upgraded" style="--mdc-ripple-fg-size: 158px; --mdc-ripple-fg-scale: 1.7754826332433935; --mdc-ripple-fg-translate-start: 80px, -39px; --mdc-ripple-fg-translate-end: 53.333343505859375px, -51px;"><span class="mdc-text-field__ripple"></span> 
+  {#if !from && !to}
+ 	<span class="mdc-floating-label" style="">filtrovat dle data úmrtí</span>    
+  {:else}  
+ 	<span class="mdc-floating-label mdc-floating-label--float-above" style="">filtrovat dle data úmrtí</span>
+  {/if}
+ <Flatpickr
+    bind:options={flatpickrOptionsRange}
     class="form-control datepicker bg-white"
     defaultDate=""
     placeholder="filtrovat dle data úmrtí"
-    on:change={event => handleChange(event)} />
+    on:change={event => handleChange(event)} 
+    element="#my-picker"
+    > 
+    	  <div class="flatpickr" id="my-picker">
+		<input type="text" placeholder="filtrovat dle data úmrtí" data-input class="mdc-text-field__input" />
+		<div style="position:relative;top:-50px; left:222px;"><button data-clear on:click="{()=>reset()}">X</button></div>
+	  </div>  
+ </Flatpickr>
+ <div class="mdc-line-ripple" style="transform-origin: 143px center 0px;"></div></label> 
+
 </div>
 
 <style>
-.range-picker input { height:95px !important; }
+.range-picker { margin-top:0px; }
+.range-picker input { height:50px !important; }
 </style>

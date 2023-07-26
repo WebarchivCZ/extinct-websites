@@ -1,7 +1,7 @@
 <?php
-include __DIR__."/check.class.php";
+include $_SERVER['CONTEXT_DOCUMENT_ROOT']."/autocheck/check.class.php";
 
-function check($url) {
+function check($url, $uuid=false) {
 	$status=array();
 	$status['url']=$url;
 	$status['dead']=false;
@@ -9,7 +9,7 @@ function check($url) {
 	$status['manualCheck']=false;
 
 	$url=new URL($status['url']);
-	$url->loadData($GLOBALS['db']);
+	$url->loadData($GLOBALS['db'], $uuid);
 	$status['code']=$url->getLastCode();
 
 

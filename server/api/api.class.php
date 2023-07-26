@@ -496,7 +496,7 @@ class Api {
 					}
 					
 	 			}
-				$import[]=hashUrl($hashValue);
+				$import[]=$hashValue;
 			}
 		}
 		return $import;

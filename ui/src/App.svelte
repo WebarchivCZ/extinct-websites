@@ -222,13 +222,13 @@
 					<tr>
 					    <th></th>
 					    <th>URL</th>
-					    <th>Info</th>
+					    <th style="min-width:205px;">Info</th>
 					    <th>Poslední kontrola</th>
 					    <th>Index úmrtí</th>
 					    <th>Stav</th>
 					    <th>Datum úmrtí</th>
 					    <!--<th>Kategorie</th>-->
-					    <th>Ověřit</th>
+					    <th style="min-width:80px;">Kontrola</th>
 					</tr>
 				    </thead>
 				    <tbody>
@@ -237,10 +237,10 @@
 				  			<td><label><input type=checkbox bind:group={checkbox} value={row.UUID} class="selectCheckbox"></label></td>
 				  			<td><a href="{getUrl(row.url)}" target="web">{showUrl(row.url)}</a></td>
 				  			<td class="click">
-				  				<span title="Harvest data" on:click="{()=>openDialog(row.UUID, 'harvest', row.url)}"><Icon type="info" /></span>
-				  				<span title="Page data" on:click="{()=>(openDialog(row.UUID, 'page', row.url))}" style="{getMetadataStyle(row.status.metadata, row.status.date)}"><Icon type="page" /></span>
-				  				<span title="Whois" on:click="{()=>(openDialog(row.UUID, 'whois', row.url))}" style="{getMetadataStyle(row.status.whois, row.status.date)}"><Icon type="contact" /></span>
-				  				<span title="Webarchiv"><a href="https://wayback.webarchiv.cz/secure/*/{row.url}" target="webarchiv"><Icon type="archive" /></a></span>
+				  				<span on:click="{()=>openDialog(row.UUID, 'harvest', row.url)}"><Icon type="info" title="Harvest data" /></span>
+				  				<span on:click="{()=>(openDialog(row.UUID, 'page', row.url))}" style="{getMetadataStyle(row.status.metadata, row.status.date)}"><Icon type="page" title="Page data" /></span>
+				  				<span on:click="{()=>(openDialog(row.UUID, 'whois', row.url))}" style="{getMetadataStyle(row.status.whois, row.status.date)}"><Icon type="contact" title="Whois" /></span>
+				  				<span><a href="https://wayback.webarchiv.cz/secure/*/{row.url}" target="webarchiv"><Icon type="archive" title="Webarchiv" /></a></span>
 				  			</td>
 				  			<td>
 				  				{#if row.status.date}
@@ -257,11 +257,11 @@
 				  			<td class="click">
 				  				{#if row.status}
 				  					{#if row.status.dead && row.status.confirmed && row.status.dead!="0" || row.exticint.date}
-				  						<span title="Označit za živý" on:click="{()=>(openDialog(row.UUID, 'alive', row.url))}"><Icon type="no" /></span>
+				  						<span on:click="{()=>(openDialog(row.UUID, 'alive', row.url))}"><Icon type="no" title="Označit za živý" /></span>
 				  					{:else if row.status.dead && row.status.dead!="0" || row.status.requires=="1"}
-				  						<span title="Označit za mrtvý / živý" on:click="{()=>(openDialog(row.UUID, 'unknown', row.url))}"><Icon type="down" /></span>
+				  						<span on:click="{()=>(openDialog(row.UUID, 'unknown', row.url))}"><Icon type="down" title="Označit za mrtvý / živý" /></span>
 				  					{:else}
-				  						<span title="Označit za mrtvý" on:click="{()=>(openDialog(row.UUID, 'dead', row.url))}"><Icon type="ok" /></span>
+				  						<span on:click="{()=>(openDialog(row.UUID, 'dead', row.url))}"><Icon type="ok" title="Označit za mrtvý" /></span>
 				  					{/if}
 				  				{/if}
 				  			</td>
@@ -274,7 +274,7 @@
 				  				<span title="Zařadit do kategorie" on:click="{()=>(openDialog(row.UUID, 'category', false))}"><Icon type="category" /></span>&nbsp;&nbsp;&nbsp;
 				  			</td>-->
 				  			<td class="click">
-				  				<span title="Ověřit dostupnost webu" on:click="{()=>(openDialog(row.UUID, 'verify', row.url))}"><Icon type="verify" /></span>&nbsp;&nbsp;&nbsp;
+				  				<span on:click="{()=>(openDialog(row.UUID, 'verify', row.url))}"><Icon type="verify" title="Zkontrolovat metadata webu" /></span>&nbsp;&nbsp;&nbsp;
 				  			</td>
 				  		</tr>
 				  	{/each}
@@ -298,6 +298,10 @@
 					  <Label>Vyžádat kontrolu</Label>
 					</Button>
 					<br><br><a href="#" onclick="return false;" on:click={() => selectAll(data)}>Vybrat vše / zrušit výběr</a>
+					{#if data.stats.sum}
+						<div style="float:right;width:200px;text-align:right;">záznamů: {data.stats.sum}</div>
+						<br style="clear:both" />
+					{/if}
 				</div>
 				<Button on:click={() => window.open($api+'?db='+$db+'&page='+(page-1)+'&limit='+limit+getParams(), "_blank")} variant="unelevated" color="secondary">
 				  <Label>Zobrazit data jako JSON</Label>
@@ -307,9 +311,10 @@
 		    <br />
 		    <div style="margin:auto;text-align:center;">
 		    	  {#if active && active!="VŠE"}
-				  <Button on:click={() => (openDialog(false, "autoCheck", false))} variant="raised">
-				  	<Label>Nastavit automatickou kontrolu</Label>
-				  </Button>
+		    	  	<b>Akce pro kategorii:&nbsp;&nbsp;</b>
+				<Button on:click={() => (openDialog(false, "autoCheck", false))} variant="raised">
+					<Label>Nastavit automatickou kontrolu</Label>
+				</Button>
 			  {/if}
 			  <Button on:click={() => (openDialog(false, "addUrl", false))} variant="raised">
 			  	<Label>Přidat URL</Label>
@@ -335,7 +340,7 @@
 
 </main>
 <footer>
-	Extinct Websites v1.1
+	Extinct Websites v1.2
 </footer>
 
 <style>
@@ -368,8 +373,6 @@ input.selectCheckbox {
 }
 
 .filterDataRange {
-    position: relative;
-    top: 16px;
     margin-left: 5px;
 }
 
