@@ -144,7 +144,17 @@ if(!empty($_GET['kat'])) {
 	$where.=" url_group.groupname='".sqlInject($_GET['kat'])."'"; 
 }
 
-$api->loadData($db, $where, '', $from, $limit, $join);
+
+if($_GET['order']=="url") { $order="url.url"; }
+elseif($_GET['order']=="checkTime") { $order="status.date"; }
+elseif($_GET['order']=="deadTime") { $order="exticint.exticintDate"; }
+elseif($_GET['order']=="index") { $order="status.metadata_match"; }
+else { $order="url.id"; }
+
+if(!empty($_GET['orderReverse'])) { $order.=" DESC"; }
+else { $order.=" ASC"; }
+
+$api->loadData($db, $where, $order, $from, $limit, $join);
 $import=$api->import($db);	
 if($import) { 
 	$data=$import; 

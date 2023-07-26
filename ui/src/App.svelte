@@ -21,6 +21,7 @@
   	import Pagination from "./components/Pagination.svelte";
   	import LimitSelect from "./components/LimitSelect.svelte";
   	import Notify from "./components/Notify.svelte";
+  	import OrderStatus from "./components/OrderStatus.svelte";
   	import { api, db } from "./ConfigService.js";
 
   export let urlPath = "";
@@ -34,6 +35,8 @@
   export let checkbox=[];
   export let filterDateFrom=false;
   export let filterDateTo=false;
+  export let order="id";
+  export let orderReverse=false;
   
   export let page=1;
   export let limit=15;
@@ -55,6 +58,10 @@
   	if(filterType && filterType!="") { param+='&filter='+filterType; }
   	if(filterDateFrom && filterDateFrom!="") { param+='&dateFrom='+filterDateFrom; }
   	if(filterDateTo && filterDateTo!="") { param+='&dateTo='+filterDateTo; }
+  	if(order) {
+  		param+='&order='+order;
+  		if(orderReverse) { param+='&orderReverse=1'; }
+  	} 
   	return param;
   }
 
@@ -92,7 +99,7 @@
  });
  
  $: {
- 	if(active) { loadData(filterUrl, filterType, page, limit, filterDateFrom, filterDateTo); }
+ 	if(active) { loadData(filterUrl, filterType, page, limit, filterDateFrom, filterDateTo, order, orderReverse); }
  	if(needsUpdate) { 
  		checkbox=[];
  		loadData(needsUpdate); 
@@ -220,13 +227,13 @@
 				<table class="table data-table m-0">
 				    <thead>
 					<tr>
-					    <th></th>
-					    <th>URL</th>
+					    <th><OrderStatus id="id" bind:order bind:orderReverse /></th>
+					    <th>URL <OrderStatus id="url" bind:order bind:orderReverse /></th>
 					    <th style="min-width:205px;">Info</th>
-					    <th>Poslední kontrola</th>
-					    <th>Index úmrtí</th>
+					    <th>Poslední kontrola <OrderStatus id="checkTime" bind:order bind:orderReverse /></th>
+					    <th>Index úmrtí <OrderStatus id="index" bind:order bind:orderReverse /></th>
 					    <th>Stav</th>
-					    <th>Datum úmrtí</th>
+					    <th>Datum úmrtí <OrderStatus id="deadTime" bind:order bind:orderReverse /></th>
 					    <!--<th>Kategorie</th>-->
 					    <th style="min-width:80px;">Kontrola</th>
 					</tr>
