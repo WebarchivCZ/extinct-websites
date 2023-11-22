@@ -1,7 +1,7 @@
 <?php
 include $_SERVER['CONTEXT_DOCUMENT_ROOT']."/autocheck/check.class.php";
 
-function check($url, $uuid=false) {
+function check($url, $uuid=false, $saveToStatus=true) {
 	$status=array();
 	$status['url']=$url;
 	$status['dead']=false;
@@ -52,10 +52,12 @@ function check($url, $uuid=false) {
 			//definice skóre
 			$maxScore=5;
 			switch ($key) {
-			case "h1_titles":
+			case "title":
 				$maxScore=70; break;
-			case "h2_titles":
+			case "h1_titles":
 				$maxScore=60; break;
+			case "h2_titles":
+				$maxScore=50; break;
 			case "met_author":
 				$maxScore=40; break;
 			case "met_description":
@@ -127,8 +129,9 @@ function check($url, $uuid=false) {
 	//uložení výsledku do databáze
 	$url_id=$url->getUrlId();
 	if(!empty($url->getUrlId())) {
-		if($status['deadIndex']>=100) { $status['dead']=true; }
-		elseif($status['deadIndex']>=50) { $status['manualCheck']=true; }
+		/*if($status['deadIndex']>=100) { $status['dead']=true; }
+		elseif($status['deadIndex']>=50) { $status['manualCheck']=true; }*/
+		if($status['deadIndex']>=50) { $status['manualCheck']=true; }
 		
 		$col="id_url=".$url->getUrlId().", ";
 		$col.="dead=".intval($status['dead']).", ";
@@ -150,7 +153,7 @@ function check($url, $uuid=false) {
 		}
 		$col.="date='".date("Y-m-d H:i:s")."' ";
 		
-		mysqli_query($GLOBALS['db'], "INSERT INTO status SET ".$col);
+		if($saveToStatus) { mysqli_query($GLOBALS['db'], "INSERT INTO status SET ".$col); }
 		
 		//uložení do databáze mrtvých webů
 		if($status['dead']) {

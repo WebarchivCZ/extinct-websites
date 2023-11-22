@@ -54,7 +54,7 @@
  function objectIntoLines(obj) {
  	let out="";
 	for(const [key, value] of Object.entries(obj)) {
-	  out+=value.replaceAll(",", ", ")+"<br>";
+		if(!out.includes(value+"<br>")) { out+=value.replaceAll(",", ", ")+"<br>"; }
 	}
  	return out;
  }
@@ -155,6 +155,6 @@ a { cursor:pointer; }
 .activeIcon { color:rgb(98, 0, 238); }
 .outlined { height:60px; }
 .key { font-weight:bold; }
-.subcategory { margin-left:50px; }
+.subcategory { margin-left:50px; overflow-x:auto; }
 .tableValues td { vertical-align:top; border:1px dashed silver; padding:5px; max-width:200px; }
 </style>

@@ -8,8 +8,18 @@ include $_SERVER['CONTEXT_DOCUMENT_ROOT']."/autocheck/check.php";
 include "../fce.php";
 include "./api.class.php";
 
-$api=new Api("url", "id", "url", "url");
+function convertToSeeder($data) {
+	foreach($data as &$d) {
+		$d['status']['date']=dateToIso($d['status']['date']);
+		$d['date_monitoring_start']=dateToIso($d['harvest_first'][0]['timestamp']);
+		$d['status_code']=$d['harvest_last'][0]['seeds_report'][0]['code'];
+		unset($d['harvest_first']);
+		unset($d['harvest_last']);
+	}
+	return $data;
+}
 
+$api=new Api("url", "id", "url", "url");
 
 if($_GET['type']=="app") {
 	$api->addItem("id");
@@ -36,6 +46,39 @@ if($_GET['type']=="app") {
 		
 	$api->dataMoveArray("url", "seeds_info");
 	$api->dataMoveArray("contract", "seeds_info");
+
+} else if($_GET['type']=="seeder") {
+	$api->addItem("id");
+	$api->addItem("UUID");
+	$api->addItem("url");
+		
+	//stav webu
+	$api->addGroup("status");
+		$api->addSubItem("dead");
+		$api->addSubItem("confirmed");
+		$api->addSubItem("requires");	
+		$api->addSubItem("metadata");	
+		$api->addSubItem("metadata_match");
+		$api->addSubItem("whois");		
+		$api->addSubItem("date");
+		
+	$api->addGroup("extinct", "exticint", "exticint");
+		$api->addSubItem("date", false, "exticintDate");
+		
+	$api->addExtension("harvest_first", "harvest", "id_url", "harvest_metadata", false, false, "id", "timestamp ASC, id DESC limit 0,1");
+ 		$api->addExtensionItem("timestamp");
+ 		
+ 		$api->addExtension("seeds_report", "harvest_report", "id_harvest", "harvest_metadata.seeds_report", true);
+ 			$api->addExtensionItem("code");
+ 	
+ 	$api->addExtension("harvest_last", "harvest", "id_url", "harvest_metadata", false, false, "id", "timestamp DESC, id DESC limit 0,1");
+ 		
+ 		$api->addExtension("seeds_report", "harvest_report", "id_harvest", "harvest_metadata.seeds_report", true);
+ 			$api->addExtensionItem("code");
+
+	$api->dataMoveArray("url", "seeds_info");
+	$api->dataMoveArray("contract", "seeds_info");
+	
 	
 } elseif($_GET['type']=="url") {
 	$api->addItem("url");
@@ -63,7 +106,6 @@ if($_GET['type']=="app") {
  			$api->addExtensionItem("redirect", "redirect_last");
 			$api->addExtensionItem("UUID_final_url");
  			$api->addExtensionItem("redirect_depth");
- 			//nové
  			$api->addExtensionItem("contentType", "Content-Type");
  			$api->addExtensionItem("Encoding");
  			$api->addExtensionItem("contentLength", "Content-Length");
@@ -119,7 +161,7 @@ $limit=100;
 $from=0;
 $where="url!='' ";
 $join="";
-if(!empty($_GET['limit']) && $_GET['limit']>0 && $_GET['limit']<=5000) { $limit=intval($_GET['limit']); }
+if(!empty($_GET['limit']) && $_GET['limit']>0 && $_GET['limit']<=10000) { $limit=intval($_GET['limit']); }
 if(!empty($_GET['from'])) { $from=intval($_GET['from']); }
 elseif(!empty($_GET['page'])) { $from=$limit*intval($_GET['page']); }
 if(!empty($_GET['uuid'])) { $where.="and uuid='".$api->sqlInject($_GET['uuid'])."'"; }
@@ -154,7 +196,6 @@ else { $order="url.id"; }
 if(!empty($_GET['orderReverse'])) { $order.=" DESC"; }
 else { $order.=" ASC"; }
 
-$api->loadData($db, $where, $order, $from, $limit, $join);
 $import=$api->import($db);	
 if($import) { 
 	$data=$import; 
@@ -164,10 +205,14 @@ if($import) {
 		}
 	}
 } else { 
+	$api->loadData($db, $where, $order, $from, $limit, $join);
 	$data=$api->getData(); 
 }
 
-$out["data"]=$data;
+
+if($_GET['type']=="seeder") { $out["data"]=convertToSeeder($data); }
+else { $out["data"]=$data; }
+
 $out["stats"]["sum"]=$api->getSum($db, $where, $join);
 if(DEBUG) { $out["stats"]["query"]=str_replace(array("\n", "\t"), "", $api->getSqlQuery($where, $order, $from, $limit, $join)); }
 

@@ -169,6 +169,7 @@ class Api {
 				} else {
 					//$arr['sql'][]=$ext->getSelect($idArray);
 					$i=0; $x=-1; $lastId=-1;
+									//$ext->getSelect($idArray)
 					$select=mysqli_query($connection, $ext->getSelect($idArray));
 					
 					if($subItem) {
@@ -384,19 +385,27 @@ class Api {
 	 						foreach($ext->getItems() as &$item) {	
 	 							if($item->getSqlName()!="id") { $col[]=$item->getSqlName(); }
 	 						}
-	 						foreach($values as &$val) {
-	 							if(!empty($val)) {
-									if(is_array($val)) {
-										//pokud je vložená hodnota pole
-		 								foreach($val as &$v) {
-					 						$sql="INSERT INTO ".$ext->getTable()." SET ".$col[0]."='".$this->sqlInject($key)."', ".$col[1]."='".$this->sqlInject($v)."', ".$ext->getWhereColumn()."=".intval($lastId).$ext->getDateSet().";";
+	 						if(!is_array($values) && $values!="None" && $values!="NaN") {
+	 							$sql="INSERT INTO ".$ext->getTable()." SET ".$col[0]."='".$this->sqlInject($key)."', ".$col[1]."='".$this->sqlInject($values)."', ".$ext->getWhereColumn()."=".intval($lastId).$ext->getDateSet().";";
+								mysqli_query($connection, $sql);
+								if(DEBUG) { echo $sql."\n"; }
+	 						} else {
+		 						foreach($values as &$val) {
+		 							if(!empty($val)) {
+										if(is_array($val)) {
+											//pokud je vložená hodnota pole
+			 								foreach($val as &$v) {
+			 									if($v!="None" && $v!="NaN") {
+							 						$sql="INSERT INTO ".$ext->getTable()." SET ".$col[0]."='".$this->sqlInject($key)."', ".$col[1]."='".$this->sqlInject($v)."', ".$ext->getWhereColumn()."=".intval($lastId).$ext->getDateSet().";";
+													mysqli_query($connection, $sql);
+													if(DEBUG) { echo $sql."\n"; }
+												}
+											}
+										} elseif($val!="None" && $val!="NaN") {
+					 						$sql="INSERT INTO ".$ext->getTable()." SET ".$col[0]."='".$this->sqlInject($key)."', ".$col[1]."='".$this->sqlInject($val)."', ".$ext->getWhereColumn()."=".intval($lastId).$ext->getDateSet().";";
 											mysqli_query($connection, $sql);
 											if(DEBUG) { echo $sql."\n"; }
 										}
-									} elseif($val!="None" && $val!="NaN") {
-				 						$sql="INSERT INTO ".$ext->getTable()." SET ".$col[0]."='".$this->sqlInject($key)."', ".$col[1]."='".$this->sqlInject($val)."', ".$ext->getWhereColumn()."=".intval($lastId).$ext->getDateSet().";";
-										mysqli_query($connection, $sql);
-										if(DEBUG) { echo $sql."\n"; }
 									}
 								}
 							}

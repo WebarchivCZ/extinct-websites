@@ -46,7 +46,7 @@ function reset() {
 </script>
 
 <div class="float-left range-picker" label="Range picker">
- <label class="mdc-text-field mdc-text-field--filled mdc-ripple-upgraded" style="--mdc-ripple-fg-size: 158px; --mdc-ripple-fg-scale: 1.7754826332433935; --mdc-ripple-fg-translate-start: 80px, -39px; --mdc-ripple-fg-translate-end: 53.333343505859375px, -51px;"><span class="mdc-text-field__ripple"></span> 
+ <label class="mdc-text-field mdc-text-field--filled mdc-ripple-upgraded" style="width:270px; --mdc-ripple-fg-size: 158px; --mdc-ripple-fg-scale: 1.7754826332433935; --mdc-ripple-fg-translate-start: 80px, -39px; --mdc-ripple-fg-translate-end: 53.333343505859375px, -51px;"><span class="mdc-text-field__ripple"></span> 
   {#if !from && !to}
  	<span class="mdc-floating-label" style="">filtrovat dle data úmrtí</span>    
   {:else}  
@@ -62,7 +62,7 @@ function reset() {
     > 
     	  <div class="flatpickr" id="my-picker">
 		<input type="text" placeholder="filtrovat dle data úmrtí" data-input class="mdc-text-field__input" />
-		<div style="position:relative;top:-50px; left:222px;"><button data-clear on:click="{()=>reset()}">X</button></div>
+		<div style="position:relative;top:-50px; left:225px;"><button data-clear on:click="{()=>reset()}">X</button></div>
 	  </div>  
  </Flatpickr>
  <div class="mdc-line-ripple" style="transform-origin: 143px center 0px;"></div></label> 

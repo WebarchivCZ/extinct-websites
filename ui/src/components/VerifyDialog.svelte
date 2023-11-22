@@ -12,7 +12,7 @@
   export let needsUpdate;
   let getFromObject=false;
   
-  const titles = {url:"Adresa", dead:"Mrtvý", deadIndex:"Index úmrtí", manualCheck:"Vyžadována ruční kontrola", code:"Poslední stavový kód", redirect:"Počet přesměrování", redirectToAnotherDomain:"Přesměrování na jinou doménu", pagedata_diff:"Rozdílná metadata", pagedata_count:"Počet metadat", pagedata:"Aktuální metadata", whois_diff:"Rozdílné Whois", whois_count:"Počet Whois", whois:"Aktuální whois"};
+  const titles = {url:"Adresa", dead:"Mrtvý", deadIndex:"Index úmrtí", manualCheck:"Vyžadována ruční kontrola", code:"Poslední stavový kód", redirect:"Počet přesměrování", redirectToAnotherDomain:"Přesměrování na jinou doménu", pagedata_diff:"Rozdílná metadata", pagedata_count:"Počet metadat", pagedata:"Porovnání metadat", whois_diff:"Rozdílné Whois", whois_count:"Počet Whois", whois:"Porovnání Whois"};
  
   async function update() {
 	    if(url && (type=="verify")) {

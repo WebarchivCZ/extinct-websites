@@ -15,4 +15,9 @@ function sqlInject($value) {
 	return $value;
 }
 
+function dateToIso($date) {
+	$datetime = new DateTime($date);
+	return $datetime->format(DateTime::ATOM);
+}
+
 ?>

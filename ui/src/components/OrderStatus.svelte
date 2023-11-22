@@ -7,7 +7,6 @@
   export let orderReverse;
   
   function setOrder(o, r) {
-  console.log(id);
   	order=o;
   	orderReverse=r;
   }

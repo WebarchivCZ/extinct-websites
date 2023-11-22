@@ -16,6 +16,7 @@
   	import AutoCheckDialog from "./components/AutoCheckDialog.svelte";
   	import CategorizeDialog from "./components/CategorizeDialog.svelte";
   	import RemoveFromCategory from "./components/RemoveFromCategory.svelte";
+  	import RecordCheckDialog from "./components/RecordCheckDialog.svelte";
   	import DeadDialog from "./components/DeadDialog.svelte";
   	import Icon from "./components/Icons.svelte";
   	import Pagination from "./components/Pagination.svelte";
@@ -144,7 +145,7 @@
  }
  
  function getMetadataStyle(value, date) {
- 	if(value=="0" || date && !value) { return "color:silver"; }
+ 	if(value=="0" || !date || !value) { return "color:silver"; }
  	return "";
  }
  
@@ -244,7 +245,7 @@
 				  			<td><label><input type=checkbox bind:group={checkbox} value={row.UUID} class="selectCheckbox"></label></td>
 				  			<td><a href="{getUrl(row.url)}" target="web">{showUrl(row.url)}</a></td>
 				  			<td class="click">
-				  				<span on:click="{()=>openDialog(row.UUID, 'harvest', row.url)}"><Icon type="info" title="Harvest data" /></span>
+				  				<span on:click="{()=>openDialog(row.UUID, 'harvest', row.url)}" style="{getMetadataStyle(-1, row.status.date)}"><Icon type="info" title="Harvest data" /></span>
 				  				<span on:click="{()=>(openDialog(row.UUID, 'page', row.url))}" style="{getMetadataStyle(row.status.metadata, row.status.date)}"><Icon type="page" title="Page data" /></span>
 				  				<span on:click="{()=>(openDialog(row.UUID, 'whois', row.url))}" style="{getMetadataStyle(row.status.whois, row.status.date)}"><Icon type="contact" title="Whois" /></span>
 				  				<span><a href="https://wayback.webarchiv.cz/secure/*/{row.url}" target="webarchiv"><Icon type="archive" title="Webarchiv" /></a></span>
@@ -326,6 +327,9 @@
 			  <Button on:click={() => (openDialog(false, "addUrl", false))} variant="raised">
 			  	<Label>Přidat URL</Label>
 			  </Button>
+			  <Button on:click={() => (openDialog(false, "recordCheck", false))} variant="">
+			  	<Label>Fronta kontrolovaných URL</Label>
+			  </Button>
 		</div>
 		<br /><br />
 		    
@@ -340,6 +344,7 @@
 	<AddUrlDialog bind:active bind:type bind:needsUpdate />
 	<AutoCheckDialog bind:active bind:type />
 	<DeadDialog bind:uuid bind:type bind:needsUpdate bind:url data={data} />
+	<RecordCheckDialog bind:type />
 {/await}
 <DataDialog bind:uuid bind:url bind:type />
 <VerifyDialog bind:url bind:type bind:needsUpdate />
@@ -347,7 +352,7 @@
 
 </main>
 <footer>
-	Extinct Websites v1.2
+	Extinct Websites v1.3
 </footer>
 
 <style>
