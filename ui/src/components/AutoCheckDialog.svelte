@@ -62,13 +62,18 @@
 	setDefault(await data);
   }
   
+  function valueToInt(v) {
+  	if(v=="*") { return v; }
+  	return parseInt(v);
+  }
+  
+  
   function setDefault(data) {
-  console.log(data);
   	if(data) {
 	  	let spl=data[0]['check'].split(" ");
-	  	month=spl[0];
-	  	day=spl[1];
-	  	hour=spl[2];
+	  	month=valueToInt(spl[0]);
+	  	day=valueToInt(spl[1]);
+	  	hour=valueToInt(spl[2]);
 	}
   	
   }

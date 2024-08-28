@@ -45,7 +45,7 @@ function check($url, $uuid=false, $saveToStatus=true) {
 				//$status['pagedata_diff'][$key]+=array_diff($data2[$key][0], $data1[$key][0]);
 			}
 			if(!empty($data3)) {
-				$status['pagedata_diff'][$key]+=array_diff($data1[$key][0], $data3[$key][0]);
+				$status['pagedata_diff'][$key][]=array_diff($data1[$key][0], $data3[$key][0]);
 				//$status['pagedata_diff'][$key]+=array_diff($data3[$key][0], $data1[$key][0]);
 			}
 			$status['pagedata_count'][$key]=count($data1[$key][0]);
@@ -53,7 +53,8 @@ function check($url, $uuid=false, $saveToStatus=true) {
 			$maxScore=5;
 			switch ($key) {
 			case "title":
-				$maxScore=70; break;
+				//$maxScore=70; break;
+				$maxScore=0; break;
 			case "h1_titles":
 				$maxScore=60; break;
 			case "h2_titles":

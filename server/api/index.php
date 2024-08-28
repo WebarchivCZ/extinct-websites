@@ -11,7 +11,7 @@ include "./api.class.php";
 function convertToSeeder($data) {
 	foreach($data as &$d) {
 		$d['status']['date']=dateToIso($d['status']['date']);
-		$d['date_monitoring_start']=dateToIso($d['harvest_first'][0]['timestamp']);
+		$d['date_monitoring_start']=dateToIso($d['harvest_first'][0]['seeds_report'][0]['Date']);
 		$d['status_code']=$d['harvest_last'][0]['seeds_report'][0]['code'];
 		unset($d['harvest_first']);
 		unset($d['harvest_last']);
@@ -48,6 +48,7 @@ if($_GET['type']=="app") {
 	$api->dataMoveArray("contract", "seeds_info");
 
 } else if($_GET['type']=="seeder") {
+
 	$api->addItem("id");
 	$api->addItem("UUID");
 	$api->addItem("url");
@@ -65,13 +66,14 @@ if($_GET['type']=="app") {
 	$api->addGroup("extinct", "exticint", "exticint");
 		$api->addSubItem("date", false, "exticintDate");
 		
-	$api->addExtension("harvest_first", "harvest", "id_url", "harvest_metadata", false, false, "id", "timestamp ASC, id DESC limit 0,1");
+	$api->addExtension("harvest_first", "harvest", "id_url", "harvest_metadata", false, false, "id", "timestamp ASC", "id_url");
  		$api->addExtensionItem("timestamp");
  		
  		$api->addExtension("seeds_report", "harvest_report", "id_harvest", "harvest_metadata.seeds_report", true);
- 			$api->addExtensionItem("code");
+ 			//$api->addExtensionItem("code");
+ 			$api->addExtensionItem("Date");
  	
- 	$api->addExtension("harvest_last", "harvest", "id_url", "harvest_metadata", false, false, "id", "timestamp DESC, id DESC limit 0,1");
+ 	$api->addExtension("harvest_last", "harvest", "id_url", "harvest_metadata", false, false, "id", "timestamp DESC", "id_url");
  		
  		$api->addExtension("seeds_report", "harvest_report", "id_harvest", "harvest_metadata.seeds_report", true);
  			$api->addExtensionItem("code");
@@ -161,7 +163,7 @@ $limit=100;
 $from=0;
 $where="url!='' ";
 $join="";
-if(!empty($_GET['limit']) && $_GET['limit']>0 && $_GET['limit']<=10000) { $limit=intval($_GET['limit']); }
+if(!empty($_GET['limit']) && $_GET['limit']>0 && $_GET['limit']<=12000) { $limit=intval($_GET['limit']); }
 if(!empty($_GET['from'])) { $from=intval($_GET['from']); }
 elseif(!empty($_GET['page'])) { $from=$limit*intval($_GET['page']); }
 if(!empty($_GET['uuid'])) { $where.="and uuid='".$api->sqlInject($_GET['uuid'])."'"; }
@@ -201,7 +203,7 @@ if($import) {
 	$data=$import; 
 	if(!empty($data)) {
 		foreach($data as &$uuid) {
-			check(false, $uuid);
+			check(false, $uuid, true);
 		}
 	}
 } else { 

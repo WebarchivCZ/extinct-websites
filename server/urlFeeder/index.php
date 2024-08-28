@@ -45,7 +45,7 @@ $achck=array();
 $m=date("n");
 $d=date("j");
 $h=date("G");
-$achck[]='* * *';		
+$achck[]='* * *';	$achck[]='*  ';	
 $achck[]=$m.' '.$d.' '.$h;
 $achck[]='* '.$d.' '.$h;
 $achck[]=$m.' * '.$h;
@@ -54,8 +54,8 @@ $achck[]='* * '.$h;
 $achck[]=$m.' * *';
 $achck[]='* '.$d.' *';
 
-
-$result = mysqli_query($db, "SELECT COUNT(id) as c from url_group WHERE autocheck in ('".implode("','", $achck)."') and (lastcheck NOT LIKE '".date("Y-m-d")." %' or lastcheck is NULL)"); 
+$where=" WHERE autocheck in ('".implode("','", $achck)."') and ((lastcheck NOT LIKE '".date("Y-m-d")." %' and lastcheck NOT LIKE '".date('Y-m-d',strtotime("-1 days"))." %') or lastcheck is NULL)";
+$result = mysqli_query($db, "SELECT COUNT(id) as c from url_group".$where); 
 $row = mysqli_fetch_assoc($result); 
 $out['sum']['url_group'] = intval($row['c']);
 
@@ -65,7 +65,8 @@ if($fromGroup<$limit) { $fromGroup=0; }
 
 
 if($fromGroup>=0) {
-	$select=mysqli_query($db, "SELECT url_group.*, url.url from url_group INNER JOIN url on url.id=url_group.id_url WHERE autocheck in ('".implode("','", $achck)."') and (lastcheck NOT LIKE '".date("Y-m-d")." %' or lastcheck is NULL) order by id ASC limit ".$fromGroup.", ".$limGroup);
+	$sql="SELECT url_group.*, url.url from url_group INNER JOIN url on url.id=url_group.id_url ".$where." order by id ASC limit ".$fromGroup.", ".$limGroup;
+	$select=mysqli_query($db, $sql);
 	while($r=mysqli_fetch_array($select)) {	
 		/*
 		$check=explode(" ", $r['autocheck']);
@@ -91,7 +92,7 @@ if($fromGroup>=0) {
 			//zkontrolováno? - pokud je datum poslední kontroly vyšší -> zaznamenej a již nekontroluj	
 			if(date('Y-m-d H:i:s', strtotime('-1 hour'))<$rCh['timestamp']) {
 				$check=true;
-				mysqli_query($db, "UPDATE url_group SET lastcheck='".$rCh['timestamp']."' WHERE groupname='".$r['groupname']."'"); 
+				mysqli_query($db, "UPDATE url_group SET lastcheck='".$rCh['timestamp']."' WHERE id_url='".$r['id_url']."'"); 
 			}
 		}
 		if(!$check) { $out['data'][]="https://".$r['url']; }
@@ -102,6 +103,7 @@ if($fromGroup>=0) {
 
 $out['sum']['total']=($out['sum']['url_request']+$out['sum']['url_group']);
 $out['sum']['pages']=ceil($out['sum']['total']/$limit);
+if(!empty($_GET['sql'])) { $out['sum']['sql']=$sql; }
 echo json_encode($out);
 
 ?>

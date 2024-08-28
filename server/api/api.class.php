@@ -32,11 +32,11 @@ class Api {
 		$this->groups[]=new ApiGroup($name, $importArray, $sqlTable);
 	}
 	
-	function addExtension($name, $table, $whereColumn=false, $importArray=false, $toSubGroup=true, $listOfValues=false, $idInArray="id", $orderby="id ASC") {
+	function addExtension($name, $table, $whereColumn=false, $importArray=false, $toSubGroup=true, $listOfValues=false, $idInArray="id", $orderby="id ASC", $groupby=false) {
 		if(!$whereColumn) { $whereColumn="id_".$this->mainSqlTable; }
 		if($toSubGroup) { $toSubGroup=$this->$lastGroup; }
 		$id=count($this->extensions);
-		$this->extensions[]=new ApiExtension($id, $name, $table, $whereColumn, $importArray, $toSubGroup, $listOfValues, $idInArray, $orderby);
+		$this->extensions[]=new ApiExtension($id, $name, $table, $whereColumn, $importArray, $toSubGroup, $listOfValues, $idInArray, $orderby, $groupby);
 		$this->$lastGroup=++$id;
 	}
 	
@@ -594,12 +594,18 @@ class ApiGroup {
 	
 	function getSqlJoin($parentTable="") {
 		//$join="LEFT JOIN ".$this->sqlTable." ON ".$this->sqlTable.".id_".$parentTable."=".$parentTable.".id";
-		$join="LEFT JOIN ".$this->sqlTable." ON ".$this->sqlTable.".id_".$parentTable."=".$parentTable.".id 
+		/*$join="LEFT JOIN ".$this->sqlTable." ON ".$this->sqlTable.".id_".$parentTable."=".$parentTable.".id 
 			AND NOT EXISTS (
 			     SELECT 1 FROM ".$this->sqlTable." t2
 			     WHERE t2.id_".$parentTable."=".$parentTable.".id
 			     AND t2.id >  ".$this->sqlTable.".id
-			   )";
+			   )";*/
+		$join = " LEFT JOIN (
+		    SELECT id_" . $parentTable . ", MAX(id) AS max_id
+		    FROM " . $this->sqlTable . "
+		    GROUP BY id_" . $parentTable . "
+		) ".$this->sqlTable." ON ".$this->sqlTable.".id_" . $parentTable . " = " . $parentTable . ".id
+		 LEFT JOIN " . $this->sqlTable . " ON " . $this->sqlTable . ".id = ".$this->sqlTable.".max_id";
 		foreach($this->groups as &$group) {
 			$join.=" ".$group->getSqlJoin($this->sqlTable);
 		}
@@ -631,11 +637,12 @@ class ApiExtension {
 	private $listOfValues;
 	private $idInArray;
 	private $orderby;
+	private $groupby;
 	private $date;
 	private $dateColumn;
 	private $items;
 	
-	function __construct($id, $name, $table, $whereColumn=false, $importArray=false, $subGroupId=false, $listOfValues=false, $idInArray="id", $orderby="id ASC") {
+	function __construct($id, $name, $table, $whereColumn=false, $importArray=false, $subGroupId=false, $listOfValues=false, $idInArray="id", $orderby="id ASC", $groupby=false) {
 		$this->id=$id;
 		$this->name=$name;
 		$this->table=$table;
@@ -645,6 +652,7 @@ class ApiExtension {
 		$this->listOfValues=$listOfValues;
 		$this->idInArray=$idInArray;
 		$this->orderby=$orderby;
+		$this->groupby=$groupby;
 		$this->items=array();
 		$this->addItem("id");	//přidá povinné pole ID - pro zařazení podskupin
 	}
@@ -693,8 +701,15 @@ class ApiExtension {
 			if($columns!="") { $columns.=", "; }
 			$columns.=$item->getSqlName();
 		}
-		$sql="SELECT ".$columns." from ".$this->table." WHERE ".$this->whereColumn." IN(".implode(',',$whereArray).") ORDER BY ".$this->whereColumn." ASC, ".$this->orderby;
-		//echo $sql."\n"; 
+		if($this->groupby) { 
+			$orderFce="max";
+			if(strpos($this->orderby, "ASC")) { $orderFce="min"; }
+			$sql="SELECT ".$this->whereColumn.", ".$orderFce."(id) as id from ".$this->table." WHERE id_url IN(".implode(',',$whereArray).") GROUP BY ".$this->groupby;
+
+		} else {
+			$sql="SELECT ".$columns." from ".$this->table." WHERE ".$this->whereColumn." IN(".implode(',',$whereArray).")".$groupby." ORDER BY ".$this->whereColumn." ASC, ".$this->orderby;
+		}
+		if(!empty($_GET['sql'])) { echo $sql."\n"; }
 		return $sql;
 	}
 }
