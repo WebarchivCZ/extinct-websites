@@ -1,3 +1,4 @@
 [submodule "WebBEAT"]
 	path = WebBEAT
 	url = https://github.com/WebarchivCZ/WebBEAT
+	branch = main
