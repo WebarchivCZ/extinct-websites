@@ -13,7 +13,7 @@ include "../../sqlClass.php";
  	if(!empty($_GET['group'])) { 
  		$where="groupname='".$url->sqlInject($_GET['group'])."'";
  		$data=$url->getData(0, 1, $where, "*", "groupname ASC");
-		for($i=0; $i<count($data); $i++) {
+		for($i=0; $i<count((array)$data); $i++) {
 	
 			$out[$i]['name']=$data[$i]['groupname'];
 			$out[$i]['check']=$data[$i]['autocheck'];
@@ -22,7 +22,7 @@ include "../../sqlClass.php";
  	
    	} else {
 	 	$data=$url->getData(0, 1000, $where, "groupname", "groupname ASC", "GROUP BY groupname");
-		for($i=0; $i<count($data); $i++) {
+		for($i=0; $i<count((array)$data); $i++) {
 			
 			$out[$i]=$data[$i]['groupname'];
 		}

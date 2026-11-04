@@ -17,7 +17,7 @@ $id=false;
   foreach($data["uuid"] as &$uuid) {
 
 	$select=mysqli_query($db, "SELECT id, url from url WHERE uuid='".sqlInject($uuid)."' limit 0,1");
-	while($r=mysqli_fetch_array($select)) {		
+	while($r=($select ? mysqli_fetch_array($select) : null)) {		
   		$out['url'][]=$r['url'];
   		
   		$url=new Sql("request", $db, $data);

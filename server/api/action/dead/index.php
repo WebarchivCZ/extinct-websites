@@ -19,7 +19,7 @@ else {
 foreach($uuid as $u) {
 
 	$select=mysqli_query($db, "select id from url WHERE uuid='".sqlInject($u)."' limit 0,1");
-	while($r=mysqli_fetch_array($select)) {	
+	while($r=($select ? mysqli_fetch_array($select) : null)) {	
 		$id=$r['id'];
 	}
 
@@ -27,7 +27,7 @@ foreach($uuid as $u) {
 		//status table
 		$exists=false;
 		$select=mysqli_query($db, "select id from status WHERE id_url='".$id."' limit 0,1");
-		while($r=mysqli_fetch_array($select)) {	
+		while($r=($select ? mysqli_fetch_array($select) : null)) {	
 			$exists=true;
 			mysqli_query($db, "UPDATE status SET dead=1, confirmed=1, requires=0, date='".date("Y-m-d H:i:s")."' WHERE id_url=".intval($id));
 		}
@@ -39,7 +39,7 @@ foreach($uuid as $u) {
 		//exticint table
 		$exists=false;
 		$select=mysqli_query($db, "select id from exticint WHERE id_url='".$id."' limit 0,1");
-		while($r=mysqli_fetch_array($select)) {	
+		while($r=($select ? mysqli_fetch_array($select) : null)) {	
 			$exists=true;
 			//mysqli_query($db, "UPDATE exticint SET exticintDate='".date("Y-m-d H:i:s")."' WHERE id_url=".intval($id));
 		}

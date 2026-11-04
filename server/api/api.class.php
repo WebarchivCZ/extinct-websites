@@ -20,7 +20,7 @@ class Api {
 		$this->groups=array();
 		$this->extensions=array();
 		$this->data=array();
-		$this->$lastGroup=false;
+		$this->lastGroup=false;
    	}
 	
 	function addItem($name, $importName=false, $sqlName=false) {
@@ -35,25 +35,25 @@ class Api {
 	function addExtension($name, $table, $whereColumn=false, $importArray=false, $toSubGroup=true, $listOfValues=false, $idInArray="id", $orderby="id ASC", $groupby=false) {
 		if(!$whereColumn) { $whereColumn="id_".$this->mainSqlTable; }
 		if($toSubGroup) { $toSubGroup=$this->$lastGroup; }
-		$id=count($this->extensions);
+		$id=count((array)$this->extensions);
 		$this->extensions[]=new ApiExtension($id, $name, $table, $whereColumn, $importArray, $toSubGroup, $listOfValues, $idInArray, $orderby, $groupby);
 		$this->$lastGroup=++$id;
 	}
 	
 	function addExtensionItem($name, $importName=false, $sqlName=false) {
-		$id=count($this->extensions)-1;
+		$id=count((array)$this->extensions)-1;
 		if($id>=0) {
 			$this->extensions[$id]->addItem($name, $importName, $sqlName);
 		}
 	}
 	
 	function setExtensionDate($date="0000-00-00", $column="date") {
-		$count=count($this->extensions);
+		$count=count((array)$this->extensions);
 		if($count>0) { $this->extensions[($count-1)]->setExtensionDate($date, $column); }
 	}
 	
 	function getLastGroup() {
-		$prev=count($this->groups)-1;
+		$prev=count((array)$this->groups)-1;
 		if($prev<0) { $prev=0; }
 		return $this->groups[$prev];
 	}
@@ -98,7 +98,7 @@ class Api {
 		$arr=array();
 		$i=0;
 		$select=mysqli_query($connection, $this->getSqlQuery($where, $order, $from, $limit, $join));
-		while($r=mysqli_fetch_array($select)) {	
+		while($r=($select ? mysqli_fetch_array($select) : null)) {	
 			foreach($this->items as &$item) {
 				$arr[$i][$item->getName()]=$r[$item->getSqlName()];
 			}
@@ -119,13 +119,24 @@ class Api {
 	function getSum($connection, $where="", $join="") { 
 		$sum=0;
 		//skupiny
+		$groupJoin="";
 		foreach($this->groups as &$group) {
-			$join.=" ".$group->getSqlJoin($this->mainSqlTable);
+			$groupJoin.=" ".$group->getSqlJoin($this->mainSqlTable);
 		}
+		// Optimalizace (2026-11): JOINy skupin jsou LEFT JOIN na max. 1 radek na zaznam
+		// (MAX(id) ... GROUP BY + primarni klic), pocet radku tedy nemeni. Pripoji se jen,
+		// pokud se nazev nektere jejich tabulky objevi ve WHERE nebo v ostatnich JOINech.
+		$needGroupJoin=false;
+		if(preg_match_all('/LEFT JOIN\s+(\w+)\s+ON/i', $groupJoin, $m)) {
+			foreach(array_unique($m[1]) as $t) {
+				if(stripos($where, $t)!==false || stripos($join, $t)!==false) { $needGroupJoin=true; }
+			}
+		}
+		if($needGroupJoin) { $join.=$groupJoin; }
 		if($where!="") { $where=" WHERE ".$where; }
 		$sql="SELECT count(".$this->mainSqlTable.".id) FROM ".$this->mainSqlTable." ".$join.$where;
 		$select=mysqli_query($connection, $sql);
-		while($r=mysqli_fetch_array($select)) {	
+		while($r=($select ? mysqli_fetch_array($select) : null)) {	
 			$sum=$r[0];
 		}
 		return intval($sum);
@@ -149,8 +160,8 @@ class Api {
 			if($ext->getSubGroupId()==$idExtension) {
 				if($ext->isListOfValues()) {
 					$i=-1; $lastId=0;
-					$select=mysqli_query($connection, "SELECT * from ".$ext->getTable()." where ".$ext->getWhereColumn()." IN(".implode(',',$idArray).") order by date DESC, ".$ext->getWhereColumn()." ASC");
-					while($r=mysqli_fetch_array($select)) {	
+					$select=mysqli_query($connection, "SELECT * from ".$ext->getTable()." where ".$ext->getWhereColumn()." IN(".implode(',', (array)$idArray).") order by date DESC, ".$ext->getWhereColumn()." ASC");
+					while($r=($select ? mysqli_fetch_array($select) : null)) {	
 							if($lastId!=$r[$ext->getWhereColumn()]) { $i++; }
 							$date=$r['date'];
 							if(empty($date)) { $date="0000-00-00"; }
@@ -159,8 +170,8 @@ class Api {
 					}
 					/*
 					//bez data
-					$select=mysqli_query($connection, "SELECT * from ".$ext->getTable()." where ".$ext->getWhereColumn()." IN(".implode(',',$idArray).") order by ".$ext->getWhereColumn()." ASC");
-					while($r=mysqli_fetch_array($select)) {	
+					$select=mysqli_query($connection, "SELECT * from ".$ext->getTable()." where ".$ext->getWhereColumn()." IN(".implode(',', (array)$idArray).") order by ".$ext->getWhereColumn()." ASC");
+					while($r=($select ? mysqli_fetch_array($select) : null)) {	
 							if($lastId!=$r[$ext->getWhereColumn()]) { $i++; }
 							$arr[$i][$ext->getName()][$r[1]][]=$r[2];
 							$lastId=$r[$ext->getWhereColumn()];
@@ -174,7 +185,7 @@ class Api {
 					
 					if($subItem) {
 						$i=0;
-						while($r=mysqli_fetch_array($select)) {	
+						while($r=($select ? mysqli_fetch_array($select) : null)) {	
 							$id=$r[$ext->getWhereColumn()];
 							if($lastId!=$id) { $i=0; }
 							//procházení položek
@@ -182,7 +193,7 @@ class Api {
 								foreach($arr as &$a) {								
 									foreach($a[$subItem] as &$b) {
 										if($b["id"]==$id) {
-											$count=count($b[$ext->getName()]);
+											$count=count((array)($b[$ext->getName()] ?? []));
 											$b[$ext->getName()][$i][$item->getName()]=$r[$item->getSqlName()]; 
 										}
 									}
@@ -194,12 +205,12 @@ class Api {
 						$arr=$this->getExtensionData($connection, $arr, ($idExtension+1), $subItem);
 					
 					} else { 
-						while($r=mysqli_fetch_array($select)) {	
+						while($r=($select ? mysqli_fetch_array($select) : null)) {	
 							//najde pořadí dle ID prvku
-							for($z=0; $z<count($arr); $z++) {
+							for($z=0; $z<count((array)$arr); $z++) {
 								if(intval($arr[$z]['id'])==$r[$ext->getWhereColumn()]) {
 									$x=$z;
-									$i=count($arr[$z][$ext->getName()]);
+									$i=count((array)($arr[$z][$ext->getName()] ?? []));
 								}
 							}
 							//procházení položek
@@ -243,7 +254,7 @@ class Api {
 	
 	//přesune pole pod nový název
 	function dataMoveArray($name, $to, $replace=false) {
-		for($i=0;$i<count($this->data); $i++) {
+		for($i=0;$i<count((array)$this->data); $i++) {
 			$var=$this->data[$i][$name];
 			if(!empty($var)) {
 				if($replace) {
@@ -259,7 +270,7 @@ class Api {
 	function getLastId($connection, $table=false) {
 		if(!$table) { $table=$this->mainSqlTable; }
 		$select=mysqli_query($connection, "SELECT ".$this->primaryKey." from ".$table." ORDER BY ".$this->primaryKey." DESC limit 0,1");
-		while($r=mysqli_fetch_array($select)) {	
+		while($r=($select ? mysqli_fetch_array($select) : null)) {	
 			return $r[$this->primaryKey];
 		}
 		return false;
@@ -279,7 +290,7 @@ class Api {
 		if(substr($get, 0, 1)!="[") { $get="[".$get."]"; }
 		$data = json_decode($get, true, 512, JSON_OBJECT_AS_ARRAY);
 		if(!empty($data)) {
-			for($i=0; $i<count($data); $i++) {
+			for($i=0; $i<count((array)$data); $i++) {
 				$v=$data[$i];
 				if(!empty($v[0])) { $v=$v[0]; }
 				$lastId=false;
@@ -310,7 +321,7 @@ class Api {
 						//finds if it already exists with the same unique key
 						if($this->uniqueKey && $this->uniqueKey==$item->getSqlName()) {
 							$select=mysqli_query($connection, "SELECT ".$this->primaryKey.$selCol." from ".$this->mainSqlTable." where ".$this->uniqueKey."='".$this->sqlInject($value)."'");
-							while($r=mysqli_fetch_array($select)) {	
+							while($r=($select ? mysqli_fetch_array($select) : null)) {	
 								$lastId=$r[$this->primaryKey];
 								if(!empty($r['uuid'])) { $hashValue=$r['uuid']; }
 								elseif($this->hashColumn) { $hashValue=hashUrl($this->removeCharsFromHash($r[$this->hashColumn])); }
@@ -335,7 +346,7 @@ class Api {
 						if(!empty($value)) { $value=$v[$grImpNam]; }
 						if(!empty($value)) { 
 							if($columns!="") { $columns.=", "; }	
-							if(count($grImpNam)>1) { $columns.=$item->getSqlName()."='".$this->sqlInject($value[$grImpNam[1]][$item->getImportName()])."'"; }
+							if(count((array)$grImpNam)>1) { $columns.=$item->getSqlName()."='".$this->sqlInject($value[$grImpNam[1]][$item->getImportName()])."'"; }
 							else { $columns.=$item->getSqlName()."='".$this->sqlInject($v[$group->getImportName()][$item->getImportName()])."'"; }
 						}
 					}					
@@ -422,7 +433,7 @@ class Api {
 									$value2=$value[$vex[0]][$vex[1]];
 								}
 								if($columns!="") { $columns.=", "; }
-								if(!empty(addExtension)) { $columns.=$ext->getTable().".".$item->getSqlName()."='".$this->sqlInject($value2)."'"; }
+								if(true /* PHP 8: drive !empty(addExtension) = vzdy true */) { $columns.=$ext->getTable().".".$item->getSqlName()."='".$this->sqlInject($value2)."'"; }
 							}
 						}
 						if(!empty($columns)) { 
@@ -451,32 +462,32 @@ class Api {
 								$maxC=1;	
 								if(empty($value2)) { 
 									$vex=explode(".", $item->getImportName());
-									if(count($vex)==3) { $value2=$value[$vex[0]][$vex[1]][$vex[2]]; }
-									elseif(count($vex)==2) { $value2=$value[$vex[0]][$vex[1]]; }
+									if(count((array)$vex)==3) { $value2=$value[$vex[0]][$vex[1]][$vex[2]]; }
+									elseif(count((array)$vex)==2) { $value2=$value[$vex[0]][$vex[1]]; }
 									else { 
 										$value2=$value[0][$item->getImportName()]; 
-										if(!empty($value[1])) { $maxC=count($value); }
+										if(!empty($value[1])) { $maxC=count((array)$value); }
 									}
 								} 
 								for($c=0; $c<$maxC; $c++) {
 									if($c>0) { $value2=$value[$c][$item->getImportName()]; }
 									if(!empty($value2)) {
 										if($columns[$c]!="") { $columns[$c].=", "; }
-										if(!empty(addExtension)) { $columns[$c].=$ext->getTable().".".$item->getSqlName()."='".$this->sqlInject($value2)."'"; }
+										if(true /* PHP 8: drive !empty(addExtension) = vzdy true */) { $columns[$c].=$ext->getTable().".".$item->getSqlName()."='".$this->sqlInject($value2)."'"; }
 									}
 								}
 								
 							} elseif($item->getSqlName()!="id") { 
 								$vex=explode(".", $ext->getImportArray());
-								if(count($vex)>1) { 
+								if(count((array)$vex)>1) { 
 									$d=$v[$lastExtension][0][$vex[0]][$vex[1]];
 									if(empty($d)) { $d=$v[$lastExtension][$vex[0]][$vex[1]]; }
 									if(empty($d)) { 
 										//addExtensionItem with array value
-										$count=count($columns)-1;
+										$count=count((array)$columns)-1;
 										if($count>=0) { $count=0; }
 										if($columns[$count]!="") { $columns[$count].=", "; }
-										$columns[$count].=$item->getSqlName()."='".$this->sqlInject(implode(" / ", $value2))."'";									
+										$columns[$count].=$item->getSqlName()."='".$this->sqlInject((is_array($value2) ? implode(" / ", $value2) : ""))."'";									
 									}											
 									
 									foreach($d as &$v2) { 
@@ -488,7 +499,7 @@ class Api {
 								
 								} elseif(is_array($value2)) {
 
-									for($c=0; $c<count($value2); $c++) {
+									for($c=0; $c<count((array)$value2); $c++) {
 										if($columns[$c]!="") { $columns[$c].=", "; }
 										if(!empty($value2[$c][$item->getImportName()])) { $columns[$c].=$item->getSqlName()."='".$this->sqlInject($value2[$c][$item->getImportName()])."'"; }
 									}
@@ -704,10 +715,10 @@ class ApiExtension {
 		if($this->groupby) { 
 			$orderFce="max";
 			if(strpos($this->orderby, "ASC")) { $orderFce="min"; }
-			$sql="SELECT ".$this->whereColumn.", ".$orderFce."(id) as id from ".$this->table." WHERE id_url IN(".implode(',',$whereArray).") GROUP BY ".$this->groupby;
+			$sql="SELECT ".$this->whereColumn.", ".$orderFce."(id) as id from ".$this->table." WHERE id_url IN(".implode(',', (array)$whereArray).") GROUP BY ".$this->groupby;
 
 		} else {
-			$sql="SELECT ".$columns." from ".$this->table." WHERE ".$this->whereColumn." IN(".implode(',',$whereArray).")".$groupby." ORDER BY ".$this->whereColumn." ASC, ".$this->orderby;
+			$sql="SELECT ".$columns." from ".$this->table." WHERE ".$this->whereColumn." IN(".implode(',', (array)$whereArray).")".$groupby." ORDER BY ".$this->whereColumn." ASC, ".$this->orderby;
 		}
 		if(!empty($_GET['sql'])) { echo $sql."\n"; }
 		return $sql;

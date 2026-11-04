@@ -21,14 +21,14 @@ else {
 
 foreach($uuid as &$u) {	
 	$select=mysqli_query($db, "select id from url WHERE uuid='".sqlInject($u)."' limit 0,1");
-	while($r=mysqli_fetch_array($select)) {	
+	while($r=($select ? mysqli_fetch_array($select) : null)) {	
 		$id=$r['id'];
 	}
 
 	if($id && !empty($_GET['category'])) {
 		$exists=false;
 		$select=mysqli_query($db, "select id from url_group WHERE groupname='".$category."' and id_url=".intval($id)." limit 0,1");
-		while($r=mysqli_fetch_array($select)) {	
+		while($r=($select ? mysqli_fetch_array($select) : null)) {	
 			$exists=$r['id'];
 		}
 		if(!$exists) { 
